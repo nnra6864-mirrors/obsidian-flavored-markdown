@@ -191,7 +191,7 @@ document.addEventListener("nav", async () => {
   if (nodes.length === 0) return;
 
   mermaidImport ||= await import(
-    // @ts-ignore
+    // @ts-expect-error -- remote ESM import
     "https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.4.0/mermaid.esm.min.mjs"
   );
   const mermaid = mermaidImport.default;
@@ -265,7 +265,7 @@ document.addEventListener("nav", async () => {
     if (!popupContainer) return;
 
     let panZoom: DiagramPanZoom | null = null;
-    function showMermaid() {
+    const showMermaid = () => {
       const container = popupContainer.querySelector("#mermaid-space") as HTMLElement;
       const content = popupContainer.querySelector(".mermaid-content") as HTMLElement;
       if (!content) return;
@@ -281,13 +281,13 @@ document.addEventListener("nav", async () => {
 
       // Initialize pan-zoom after showing the popup
       panZoom = new DiagramPanZoom(container, content);
-    }
+    };
 
-    function hideMermaid() {
+    const hideMermaid = () => {
       popupContainer.classList.remove("active");
       panZoom?.cleanup();
       panZoom = null;
-    }
+    };
 
     expandBtn.addEventListener("click", showMermaid);
     registerEscapeHandler(popupContainer, hideMermaid);

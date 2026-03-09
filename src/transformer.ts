@@ -6,7 +6,12 @@ import type {
   DefinitionContent,
   Paragraph,
   Code,
+  Parent,
+  Literal,
+  Image,
+  Link,
 } from "mdast";
+import type { Node } from "unist";
 import type { Element, Root as HtmlRoot } from "hast";
 import type { PluggableList } from "unified";
 import type { QuartzTransformerPlugin, JSResource, CSSResource } from "@quartz-community/types";
@@ -17,11 +22,11 @@ import rehypeRaw from "rehype-raw";
 import { SKIP, visit } from "unist-util-visit";
 import { pathToRoot, slugTag, slugifyFilePath, capitalize } from "@quartz-community/utils";
 import type { FilePath, FullSlug } from "@quartz-community/utils";
-// @ts-ignore
+// @ts-expect-error -- inline script import
 import calloutScript from "./scripts/callout.inline";
-// @ts-ignore
+// @ts-expect-error -- inline script import
 import checkboxScript from "./scripts/checkbox.inline";
-// @ts-ignore
+// @ts-expect-error -- inline script import
 import mermaidScript from "./scripts/mermaid.inline";
 import mermaidStyle from "./styles/mermaid.inline.scss";
 import { toHast } from "mdast-util-to-hast";
@@ -106,11 +111,11 @@ export const externalLinkRegex = /^https?:\/\//i;
 // (\\?\|[^\[\]\#]+)? -> optional escape \ then | then zero or more non-special characters (alias)
 // Deprecated: retained for backwards compatibility only; parsing now uses remark-obsidian.
 export const wikilinkRegex = new RegExp(
-  /!?\[\[([^\[\]\|\#\\]+)?(#+[^\[\]\|\#\\]+)?(\\?\|[^\[\]\#]*)?\]\]/g,
+  /!?\[\[([^[]\]#|\\]+)?(#+[^[]\]#|\\]+)?(\\?\|[^[]\]#]*)?\]\]/g,
 );
 // from https://github.com/escwxyz/remark-obsidian-callout/blob/main/src/index.ts
-const calloutRegex = new RegExp(/^\[\!([\w-]+)\|?(.+?)?\]([+-]?)/);
-const calloutLineRegex = new RegExp(/^> *\[\!\w+\|?.*?\][+-]?.*$/gm);
+const calloutRegex = new RegExp(/^\[!([\w-]+)\|?(.+?)?\]([+-]?)/);
+const calloutLineRegex = new RegExp(/^> *\[!\w+\|?.*?\][+-]?.*$/gm);
 // (?<=^| )             -> a lookbehind assertion, tag should start be separated by a space or be the start of the line
 // #(...)               -> capturing group, tag itself must start with #
 // (?:[-_\p{L}\d\p{Z}])+       -> non-capturing group, non-empty string of (Unicode-aware) alpha-numeric characters and symbols, hyphens and/or underscores
@@ -119,6 +124,31 @@ const videoExtensionRegex = new RegExp(/\.(mp4|webm|ogg|avi|mov|flv|wmv|mkv|mpg|
 const wikilinkImageEmbedRegex = new RegExp(
   /^(?<alt>(?!^\d*x?\d*$).*?)?(\|?\s*?(?<width>\d+)(x(?<height>\d+))?)?$/,
 );
+
+type WikilinkNode = Node & {
+  type: "wikilink";
+  path?: string;
+  heading?: string;
+  alias?: string;
+  embedded?: boolean;
+};
+
+type HighlightNode = Parent & {
+  type: "highlight";
+};
+
+type TagNode = Literal & {
+  type: "tag";
+  value: string;
+};
+
+const getLiteralValue = (child: Node): string => {
+  const literalChild = child as { value?: unknown };
+  if (typeof literalChild.value === "string") {
+    return literalChild.value;
+  }
+  return "";
+};
 
 export const ObsidianFlavoredMarkdown: QuartzTransformerPlugin<
   Partial<ObsidianFlavoredMarkdownOptions>
@@ -162,146 +192,166 @@ export const ObsidianFlavoredMarkdown: QuartzTransformerPlugin<
           const base = pathToRoot(file.data.slug! as FullSlug);
 
           if (opts.wikilinks) {
-            visit(tree, "wikilink", (node: any, index, parent) => {
-              if (parent == null || index == null) return;
+            visit(
+              tree,
+              (node) => node.type === "wikilink",
+              (node, index: number | undefined, parent: Parent | undefined) => {
+                if (parent == null || index == null) return;
+                const wikilinkNode = node as WikilinkNode;
 
-              const fp = node.path?.trim() ?? "";
-              const anchor = node.heading?.trim() ?? "";
-              const aliasRaw = node.alias?.trim() ?? "";
-              const alias = aliasRaw.length > 0 ? aliasRaw : undefined;
+                const fp = wikilinkNode.path?.trim() ?? "";
+                const anchor = wikilinkNode.heading?.trim() ?? "";
+                const aliasRaw = wikilinkNode.alias?.trim() ?? "";
+                const alias = aliasRaw.length > 0 ? aliasRaw : undefined;
 
-              let replacement: BlockContent | PhrasingContent | Html;
+                let replacement: BlockContent | PhrasingContent | Html;
 
-              if (node.embedded) {
-                const ext: string = path.extname(fp).toLowerCase();
-                const url = slugifyFilePath(fp as FilePath);
-                if ([".png", ".jpg", ".jpeg", ".gif", ".bmp", ".svg", ".webp"].includes(ext)) {
-                  const match = wikilinkImageEmbedRegex.exec(alias ?? "");
-                  const alt = match?.groups?.alt ?? "";
-                  const width = match?.groups?.width ?? "auto";
-                  const height = match?.groups?.height ?? "auto";
-                  replacement = {
-                    type: "image",
-                    url,
-                    alt: "",
-                    data: {
-                      hProperties: {
-                        width,
-                        height,
-                        alt,
+                if (wikilinkNode.embedded) {
+                  const ext: string = path.extname(fp).toLowerCase();
+                  const url = slugifyFilePath(fp as FilePath);
+                  if ([".png", ".jpg", ".jpeg", ".gif", ".bmp", ".svg", ".webp"].includes(ext)) {
+                    const match = wikilinkImageEmbedRegex.exec(alias ?? "");
+                    const alt = match?.groups?.alt ?? "";
+                    const width = match?.groups?.width ?? "auto";
+                    const height = match?.groups?.height ?? "auto";
+                    const imageNode: Image = {
+                      type: "image",
+                      url,
+                      alt: "",
+                      data: {
+                        hProperties: {
+                          width,
+                          height,
+                          alt,
+                        },
                       },
-                    },
-                  } as any;
-                } else if ([".mp4", ".webm", ".ogv", ".mov", ".mkv"].includes(ext)) {
-                  replacement = {
-                    type: "html",
-                    value: `<video src="${url}" controls></video>`,
+                    };
+                    replacement = imageNode;
+                  } else if ([".mp4", ".webm", ".ogv", ".mov", ".mkv"].includes(ext)) {
+                    replacement = {
+                      type: "html",
+                      value: `<video src="${url}" controls></video>`,
+                    };
+                  } else if (
+                    [".mp3", ".webm", ".wav", ".m4a", ".ogg", ".3gp", ".flac"].includes(ext)
+                  ) {
+                    replacement = {
+                      type: "html",
+                      value: `<audio src="${url}" controls></audio>`,
+                    };
+                  } else if ([".pdf"].includes(ext)) {
+                    replacement = {
+                      type: "html",
+                      value: `<iframe src="${url}" class="pdf"></iframe>`,
+                    };
+                  } else {
+                    // For page transclusions (e.g. ![[file.canvas]]), strip the file extension
+                    // so the embed URL targets the virtual page slug (which has no extension)
+                    // rather than the raw source file path.
+                    const transcludeUrl = slugifyFilePath(fp as FilePath, true);
+                    const block = anchor ? `#${anchor}` : "";
+                    replacement = {
+                      type: "html",
+                      data: { hProperties: { transclude: true } },
+                      value: `<blockquote class="transclude" data-url="${transcludeUrl}" data-block="${block}" data-embed-alias="${alias ?? ""}"><a href="${
+                        transcludeUrl + block
+                      }" class="transclude-inner">Transclude of ${transcludeUrl}${block}</a></blockquote>`,
+                    };
+                  }
+                } else if (fp.match(externalLinkRegex)) {
+                  const linkNode: Link = {
+                    type: "link",
+                    url: fp,
+                    children: [{ type: "text", value: alias ?? fp }],
                   };
-                } else if (
-                  [".mp3", ".webm", ".wav", ".m4a", ".ogg", ".3gp", ".flac"].includes(ext)
-                ) {
-                  replacement = {
-                    type: "html",
-                    value: `<audio src="${url}" controls></audio>`,
-                  };
-                } else if ([".pdf"].includes(ext)) {
-                  replacement = {
-                    type: "html",
-                    value: `<iframe src="${url}" class="pdf"></iframe>`,
-                  };
-                } else {
-                  // For page transclusions (e.g. ![[file.canvas]]), strip the file extension
-                  // so the embed URL targets the virtual page slug (which has no extension)
-                  // rather than the raw source file path.
-                  const transcludeUrl = slugifyFilePath(fp as FilePath, true);
-                  const block = anchor ? `#${anchor}` : "";
-                  replacement = {
-                    type: "html",
-                    data: { hProperties: { transclude: true } },
-                    value: `<blockquote class="transclude" data-url="${transcludeUrl}" data-block="${block}" data-embed-alias="${alias ?? ""}"><a href="${
-                      transcludeUrl + block
-                    }" class="transclude-inner">Transclude of ${transcludeUrl}${block}</a></blockquote>`,
-                  };
-                }
-              } else if (fp.match(externalLinkRegex)) {
-                replacement = {
-                  type: "link",
-                  url: fp,
-                  children: [{ type: "text", value: alias ?? fp }],
-                } as any;
-              } else if (opts.disableBrokenWikilinks) {
-                const slug = slugifyFilePath(fp as FilePath);
-                const exists =
-                  ctx.allSlugs && ctx.allSlugs.includes(slug as (typeof ctx.allSlugs)[number]);
-                if (!exists) {
-                  replacement = {
-                    type: "html",
-                    value: `<a class="internal broken">${alias ?? fp}</a>`,
-                  };
+                  replacement = linkNode;
+                } else if (opts.disableBrokenWikilinks) {
+                  const slug = slugifyFilePath(fp as FilePath);
+                  const exists =
+                    ctx.allSlugs && ctx.allSlugs.includes(slug as (typeof ctx.allSlugs)[number]);
+                  if (!exists) {
+                    replacement = {
+                      type: "html",
+                      value: `<a class="internal broken">${alias ?? fp}</a>`,
+                    };
+                  } else {
+                    const anchorPart = anchor ? `#${anchor}` : "";
+                    const linkNode: Link = {
+                      type: "link",
+                      url: fp + anchorPart,
+                      children: [{ type: "text", value: alias ?? fp }],
+                    };
+                    replacement = linkNode;
+                  }
                 } else {
                   const anchorPart = anchor ? `#${anchor}` : "";
-                  replacement = {
+                  const linkNode: Link = {
                     type: "link",
                     url: fp + anchorPart,
                     children: [{ type: "text", value: alias ?? fp }],
-                  } as any;
+                  };
+                  replacement = linkNode;
                 }
-              } else {
-                const anchorPart = anchor ? `#${anchor}` : "";
-                replacement = {
-                  type: "link",
-                  url: fp + anchorPart,
-                  children: [{ type: "text", value: alias ?? fp }],
-                } as any;
-              }
 
-              parent.children[index] = replacement;
-              return SKIP;
-            });
+                parent.children[index] = replacement;
+                return SKIP;
+              },
+            );
           }
 
           if (opts.highlight) {
-            visit(tree, "highlight", (node: any, index, parent) => {
-              if (parent == null || index == null) return;
-              const text = node.children?.map((child: any) => child.value ?? "").join("") ?? "";
-              parent.children[index] = {
-                type: "html",
-                value: `<span class="text-highlight">${text}</span>`,
-              };
-              return SKIP;
-            });
+            visit(
+              tree,
+              (node) => node.type === "highlight",
+              (node, index: number | undefined, parent: Parent | undefined) => {
+                if (parent == null || index == null) return;
+                const highlightNode = node as HighlightNode;
+                const text = highlightNode.children?.map(getLiteralValue).join("") ?? "";
+                parent.children[index] = {
+                  type: "html",
+                  value: `<span class="text-highlight">${text}</span>`,
+                };
+                return SKIP;
+              },
+            );
           }
 
           if (opts.parseTags) {
-            visit(tree, "tag", (node: any, index, parent) => {
-              if (parent == null || index == null) return;
-              if (/^[\/\d]+$/.test(node.value ?? "")) {
-                parent.children[index] = {
-                  type: "text",
-                  value: `#${node.value ?? ""}`,
-                };
-                return SKIP;
-              }
+            visit(
+              tree,
+              (node) => node.type === "tag",
+              (node, index: number | undefined, parent: Parent | undefined) => {
+                if (parent == null || index == null) return;
+                const tagNode = node as TagNode;
+                if (/^[/\d]+$/.test(tagNode.value ?? "")) {
+                  parent.children[index] = {
+                    type: "text",
+                    value: `#${tagNode.value ?? ""}`,
+                  };
+                  return SKIP;
+                }
 
-              let tag = slugTag(node.value);
-              if (file.data.frontmatter) {
-                const frontmatter = file.data.frontmatter as { tags?: string[] };
-                const noteTags = frontmatter.tags ?? [];
-                frontmatter.tags = [...new Set([...noteTags, tag])];
-              }
+                const tag = slugTag(tagNode.value);
+                if (file.data.frontmatter) {
+                  const frontmatter = file.data.frontmatter as { tags?: string[] };
+                  const noteTags = frontmatter.tags ?? [];
+                  frontmatter.tags = [...new Set([...noteTags, tag])];
+                }
 
-              parent.children[index] = {
-                type: "link",
-                url: base + `/tags/${tag}`,
-                data: {
-                  hProperties: {
-                    className: ["tag-link"],
+                const tagLink: Link = {
+                  type: "link",
+                  url: base + `/tags/${tag}`,
+                  data: {
+                    hProperties: {
+                      className: ["tag-link"],
+                    },
                   },
-                },
-                children: [{ type: "text", value: tag }],
-              } as any;
-              return SKIP;
-            });
+                  children: [{ type: "text", value: tag }],
+                };
+                parent.children[index] = tagLink;
+                return SKIP;
+              },
+            );
           }
 
           if (opts.enableInHtmlEmbed) {
