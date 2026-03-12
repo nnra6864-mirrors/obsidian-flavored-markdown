@@ -2,7 +2,7 @@ import { getFullSlug } from "../util/path";
 
 const checkboxId = (index: number) => `${getFullSlug(window)}-checkbox-${index}`;
 
-document.addEventListener("nav", () => {
+const setupCheckboxes = () => {
   const checkboxes = document.querySelectorAll(
     "input.checkbox-toggle",
   ) as NodeListOf<HTMLInputElement>;
@@ -20,4 +20,7 @@ document.addEventListener("nav", () => {
       el.checked = true;
     }
   });
-});
+};
+
+document.addEventListener("nav", setupCheckboxes);
+document.addEventListener("render", setupCheckboxes);

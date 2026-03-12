@@ -25,3 +25,4 @@ function setupCallout() {
 }
 
 document.addEventListener("nav", setupCallout);
+document.addEventListener("render", setupCallout);
