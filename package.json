@@ -47,7 +47,12 @@
   },
   "peerDependencies": {
     "@jackyzha0/quartz": "^4.5.2",
-    "preact": "^10.0.0"
+    "preact": "^10.0.0",
+    "hast-util-to-html": "^9.0.5",
+    "mdast-util-to-hast": "^13.2.1",
+    "rehype-raw": "^7.0.0",
+    "unified": "^11.0.5",
+    "unist-util-visit": "^5.0.0"
   },
   "peerDependenciesMeta": {
     "@jackyzha0/quartz": {
@@ -55,20 +60,28 @@
     },
     "preact": {
       "optional": false
+    },
+    "hast-util-to-html": {
+      "optional": true
+    },
+    "mdast-util-to-hast": {
+      "optional": true
+    },
+    "rehype-raw": {
+      "optional": true
+    },
+    "unified": {
+      "optional": true
+    },
+    "unist-util-visit": {
+      "optional": true
     }
   },
   "dependencies": {
     "@quartz-community/rehype-obsidian": "github:quartz-community/rehype-obsidian",
     "@quartz-community/remark-obsidian": "github:quartz-community/remark-obsidian",
     "@quartz-community/types": "github:quartz-community/types",
-    "@quartz-community/utils": "github:quartz-community/utils",
-    "hast-util-to-html": "^9.0.5",
-    "mdast-util-to-hast": "^13.2.1",
-    "rehype-raw": "^7.0.0",
-    "tsup": "^8.5.0",
-    "typescript": "^5.9.3",
-    "unified": "^11.0.5",
-    "unist-util-visit": "^5.0.0"
+    "@quartz-community/utils": "github:quartz-community/utils"
   },
   "devDependencies": {
     "@types/hast": "^3.0.4",
@@ -83,7 +96,9 @@
     "preact": "^10.28.2",
     "prettier": "^3.6.2",
     "sass": "^1.97.3",
-    "vitest": "^2.1.9"
+    "vitest": "^2.1.9",
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.3"
   },
   "engines": {
     "node": ">=22",
