@@ -46,12 +46,7 @@
   },
   "peerDependencies": {
     "@jackyzha0/quartz": "^4.5.2",
-    "hast-util-to-html": "^9.0.5",
-    "mdast-util-to-hast": "^13.2.1",
-    "preact": "^10.0.0",
-    "rehype-raw": "^7.0.0",
-    "unified": "^11.0.5",
-    "unist-util-visit": "^5.0.0"
+    "preact": "^10.0.0"
   },
   "peerDependenciesMeta": {
     "@jackyzha0/quartz": {
@@ -59,21 +54,6 @@
     },
     "preact": {
       "optional": false
-    },
-    "hast-util-to-html": {
-      "optional": true
-    },
-    "mdast-util-to-hast": {
-      "optional": true
-    },
-    "rehype-raw": {
-      "optional": true
-    },
-    "unified": {
-      "optional": true
-    },
-    "unist-util-visit": {
-      "optional": true
     }
   },
   "dependencies": {
