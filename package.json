@@ -1,19 +1,20 @@
 {
   "name": "@quartz-community/obsidian-flavored-markdown",
   "version": "0.1.0",
-  "description": "Template repository for Quartz community plugins.",
+  "description": "Obsidian Flavored Markdown transformer plugin for Quartz",
   "type": "module",
   "license": "MIT",
   "author": "Quartz Community",
-  "homepage": "https://quartz.jzhao.xyz",
+  "homepage": "https://github.com/quartz-community/obsidian-flavored-markdown",
   "repository": {
     "type": "git",
-    "url": "https://github.com/quartz-community/plugin-template"
+    "url": "https://github.com/quartz-community/obsidian-flavored-markdown"
   },
   "keywords": [
     "quartz",
     "quartz-plugin",
-    "plugin-template",
+    "obsidian",
+    "obsidian-flavored-markdown",
     "remark",
     "rehype",
     "mdast",
