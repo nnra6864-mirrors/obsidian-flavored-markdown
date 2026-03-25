@@ -209,7 +209,7 @@ export const ObsidianFlavoredMarkdown: QuartzTransformerPlugin<
                 if (wikilinkNode.embedded) {
                   const ext: string = path.extname(fp).toLowerCase();
                   const url = slugifyFilePath(fp as FilePath);
-                  if ([".png", ".jpg", ".jpeg", ".gif", ".bmp", ".svg", ".webp"].includes(ext)) {
+                  if ([".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp"].includes(ext)) {
                     const match = wikilinkImageEmbedRegex.exec(alias ?? "");
                     const alt = match?.groups?.alt ?? "";
                     const width = match?.groups?.width ?? "auto";
@@ -227,6 +227,15 @@ export const ObsidianFlavoredMarkdown: QuartzTransformerPlugin<
                       },
                     };
                     replacement = imageNode;
+                  } else if (ext === ".svg") {
+                    const match = wikilinkImageEmbedRegex.exec(alias ?? "");
+                    const alt = match?.groups?.alt ?? "";
+                    const width = match?.groups?.width ?? "auto";
+                    const height = match?.groups?.height ?? "auto";
+                    replacement = {
+                      type: "html",
+                      value: `<object data="${url}" type="image/svg+xml" width="${width}" height="${height}" aria-label="${alt}"></object>`,
+                    };
                   } else if ([".mp4", ".webm", ".ogv", ".mov", ".mkv"].includes(ext)) {
                     replacement = {
                       type: "html",
