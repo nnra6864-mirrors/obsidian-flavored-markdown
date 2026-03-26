@@ -9,7 +9,7 @@ var __export = (target, all5) => {
     __defProp(target, name, { get: all5[name], enumerable: true });
 };
 
-// node_modules/unist-util-is/lib/index.js
+// node_modules/@quartz-community/remark-obsidian/dist/index.js
 var convert = (
   // Note: overloads in JSDoc can’t yet use different `@template`s.
   /**
@@ -56,9 +56,9 @@ function anyFactory(tests) {
   }
   return castFactory(any);
   function any(...parameters) {
-    let index3 = -1;
-    while (++index3 < checks2.length) {
-      if (checks2[index3].apply(this, parameters)) return true;
+    let index22 = -1;
+    while (++index22 < checks2.length) {
+      if (checks2[index22].apply(this, parameters)) return true;
     }
     return false;
   }
@@ -107,13 +107,9 @@ function ok() {
 function looksLikeANode(value) {
   return value !== null && typeof value === "object" && "type" in value;
 }
-
-// node_modules/unist-util-visit-parents/lib/color.node.js
 function color(d) {
   return "\x1B[33m" + d + "\x1B[39m";
 }
-
-// node_modules/unist-util-visit-parents/lib/index.js
 var empty = [];
 var CONTINUE = true;
 var EXIT = false;
@@ -142,12 +138,12 @@ function visitParents(tree, test, visitor, reverse) {
           typeof value.name === "string" ? value.name : void 0
         )
       );
-      Object.defineProperty(visit2, "name", {
+      Object.defineProperty(visit22, "name", {
         value: "node (" + color(node.type + (name ? "<" + name + ">" : "")) + ")"
       });
     }
-    return visit2;
-    function visit2() {
+    return visit22;
+    function visit22() {
       let result = empty;
       let subresult;
       let offset;
@@ -189,8 +185,6 @@ function toResult(value) {
   }
   return value === null || value === void 0 ? empty : [value];
 }
-
-// node_modules/unist-util-visit/lib/index.js
 function visit(tree, testOrVisitor, visitorOrReverse, maybeReverse) {
   let reverse;
   let test;
@@ -211,8 +205,6 @@ function visit(tree, testOrVisitor, visitorOrReverse, maybeReverse) {
     return visitor(node, index2, parent);
   }
 }
-
-// node_modules/micromark-util-symbol/lib/codes.js
 var codes = (
   /** @type {const} */
   {
@@ -224,8 +216,6 @@ var codes = (
     // `=`
     greaterThan: 62}
 );
-
-// node_modules/@quartz-community/remark-obsidian/dist/index.js
 var EXCLAMATION = 33;
 var HASH = 35;
 var LEFT_BRACKET = 91;
@@ -243,7 +233,7 @@ function wikilinkSyntax() {
     }
   };
 }
-function tokenize(effects, ok3, nok) {
+function tokenize(effects, ok22, nok) {
   let hasPath = false;
   let hasHeading = false;
   let hasAlias = false;
@@ -395,7 +385,7 @@ function tokenize(effects, ok3, nok) {
     effects.consume(code2);
     effects.exit("wikilinkMarker");
     effects.exit("wikilink");
-    return ok3;
+    return ok22;
   }
 }
 var EQUALS = 61;
@@ -409,7 +399,7 @@ function highlightSyntax() {
     }
   };
 }
-function tokenize2(effects, ok3, nok) {
+function tokenize2(effects, ok22, nok) {
   const close = { tokenize: tokenizeClose, partial: true };
   let hasContent = false;
   return start;
@@ -460,7 +450,7 @@ function tokenize2(effects, ok3, nok) {
   }
   function closeAfter(code2) {
     effects.exit("highlight");
-    return ok3(code2);
+    return ok22(code2);
   }
 }
 var PERCENT = 37;
@@ -489,7 +479,7 @@ function commentSyntax() {
     }
   };
 }
-function tokenizeText(effects, ok3, nok) {
+function tokenizeText(effects, ok22, nok) {
   const close = { tokenize: tokenizeClose, partial: true };
   return start;
   function start(code2) {
@@ -536,10 +526,10 @@ function tokenizeText(effects, ok3, nok) {
   }
   function closeAfter(code2) {
     effects.exit("comment");
-    return ok3(code2);
+    return ok22(code2);
   }
 }
-function tokenizeFlow(effects, ok3, nok) {
+function tokenizeFlow(effects, ok22, nok) {
   const self2 = this;
   const flowClose = {
     tokenize: tokenizeFlowClose,
@@ -609,7 +599,7 @@ function tokenizeFlow(effects, ok3, nok) {
   }
   function closeAfter(code2) {
     effects.exit("comment");
-    return ok3(code2);
+    return ok22(code2);
   }
   function abandon(code2) {
     effects.exit("comment");
@@ -643,12 +633,12 @@ function tokenizeFlow(effects, ok3, nok) {
     }
   }
 }
-function tokenizeNonLazyContinuation(effects, ok3, nok) {
+function tokenizeNonLazyContinuation(effects, ok22, nok) {
   const self2 = this;
   return start;
   function start(code2) {
     if (code2 === null) {
-      return ok3(code2);
+      return ok22(code2);
     }
     if (!isLineEnding3(code2)) return nok(code2);
     effects.enter("lineEnding");
@@ -657,7 +647,7 @@ function tokenizeNonLazyContinuation(effects, ok3, nok) {
     return lineStart;
   }
   function lineStart(code2) {
-    return self2.parser.lazy[self2.now().line] ? nok(code2) : ok3(code2);
+    return self2.parser.lazy[self2.now().line] ? nok(code2) : ok22(code2);
   }
 }
 var HASH2 = 35;
@@ -669,7 +659,7 @@ function isWhitespace(code2) {
   return code2 === codes.space || code2 === codes.horizontalTab || code2 === codes.lineFeed || code2 === codes.carriageReturn || code2 === codes.carriageReturnLineFeed;
 }
 function isTagChar(code2) {
-  if (code2 === null) return false;
+  if (code2 === null || code2 < 0) return false;
   if (code2 >= 48 && code2 <= 57) return true;
   if (code2 === DASH || code2 === UNDERSCORE) return true;
   return tagCharRegex.test(String.fromCodePoint(code2));
@@ -685,7 +675,7 @@ function tagSyntax() {
     }
   };
 }
-function tokenize3(effects, ok3, nok) {
+function tokenize3(effects, ok22, nok) {
   let hasNonDigit = false;
   const context = this;
   return start;
@@ -729,7 +719,7 @@ function tokenize3(effects, ok3, nok) {
     if (!hasNonDigit) return nok(code2);
     effects.exit("tagContent");
     effects.exit("tag");
-    return ok3(code2);
+    return ok22(code2);
   }
 }
 function wikilinkFromMarkdown() {
@@ -832,6 +822,48 @@ function tagFromMarkdown() {
     }
   };
 }
+function wikilinkToMarkdown() {
+  return {
+    handlers: {
+      wikilink(node) {
+        const prefix = node.embedded ? "!" : "";
+        const heading2 = node.heading ? `#${node.heading}` : "";
+        const alias = node.alias ? `|${node.alias}` : "";
+        return `${prefix}[[${node.path}${heading2}${alias}]]`;
+      }
+    }
+  };
+}
+function highlightToMarkdown() {
+  return {
+    handlers: {
+      highlight(node, _parent, state, info) {
+        const exit = state.enter("highlight");
+        const content = state.containerPhrasing(node, info);
+        exit();
+        return `==${content}==`;
+      }
+    }
+  };
+}
+function commentToMarkdown() {
+  return {
+    handlers: {
+      comment(node) {
+        return `%%${node.value}%%`;
+      }
+    }
+  };
+}
+function tagToMarkdown() {
+  return {
+    handlers: {
+      tag(node) {
+        return `#${node.value}`;
+      }
+    }
+  };
+}
 function customTaskCharTransform(tree) {
   visit(tree, "listItem", (node) => {
     if (typeof node.checked === "boolean") {
@@ -875,21 +907,26 @@ function remarkObsidian(userOpts) {
   const data = this.data();
   data.micromarkExtensions ??= [];
   data.fromMarkdownExtensions ??= [];
+  data.toMarkdownExtensions ??= [];
   if (opts.wikilinks) {
     data.micromarkExtensions.push(wikilinkSyntax());
     data.fromMarkdownExtensions.push(wikilinkFromMarkdown());
+    data.toMarkdownExtensions.push(wikilinkToMarkdown());
   }
   if (opts.comments) {
     data.micromarkExtensions.push(commentSyntax());
     data.fromMarkdownExtensions.push(commentFromMarkdown());
+    data.toMarkdownExtensions.push(commentToMarkdown());
   }
   if (opts.tags) {
     data.micromarkExtensions.push(tagSyntax());
     data.fromMarkdownExtensions.push(tagFromMarkdown());
+    data.toMarkdownExtensions.push(tagToMarkdown());
   }
   if (opts.highlights) {
     data.micromarkExtensions.push(highlightSyntax());
     data.fromMarkdownExtensions.push(highlightFromMarkdown());
+    data.toMarkdownExtensions.push(highlightToMarkdown());
   }
   const needsTransform = opts.comments || opts.customTaskChars;
   if (!needsTransform) return void 0;
@@ -913,8 +950,211 @@ function remarkObsidian(userOpts) {
   };
 }
 
-// node_modules/devlop/lib/default.js
+// node_modules/unist-util-is/lib/index.js
+var convert2 = (
+  // Note: overloads in JSDoc can’t yet use different `@template`s.
+  /**
+   * @type {(
+   *   (<Condition extends string>(test: Condition) => (node: unknown, index?: number | null | undefined, parent?: Parent | null | undefined, context?: unknown) => node is Node & {type: Condition}) &
+   *   (<Condition extends Props>(test: Condition) => (node: unknown, index?: number | null | undefined, parent?: Parent | null | undefined, context?: unknown) => node is Node & Condition) &
+   *   (<Condition extends TestFunction>(test: Condition) => (node: unknown, index?: number | null | undefined, parent?: Parent | null | undefined, context?: unknown) => node is Node & Predicate<Condition, Node>) &
+   *   ((test?: null | undefined) => (node?: unknown, index?: number | null | undefined, parent?: Parent | null | undefined, context?: unknown) => node is Node) &
+   *   ((test?: Test) => Check)
+   * )}
+   */
+  /**
+   * @param {Test} [test]
+   * @returns {Check}
+   */
+  (function(test) {
+    if (test === null || test === void 0) {
+      return ok2;
+    }
+    if (typeof test === "function") {
+      return castFactory2(test);
+    }
+    if (typeof test === "object") {
+      return Array.isArray(test) ? anyFactory2(test) : (
+        // Cast because `ReadonlyArray` goes into the above but `isArray`
+        // narrows to `Array`.
+        propertiesFactory2(
+          /** @type {Props} */
+          test
+        )
+      );
+    }
+    if (typeof test === "string") {
+      return typeFactory2(test);
+    }
+    throw new Error("Expected function, string, or object as test");
+  })
+);
+function anyFactory2(tests) {
+  const checks2 = [];
+  let index2 = -1;
+  while (++index2 < tests.length) {
+    checks2[index2] = convert2(tests[index2]);
+  }
+  return castFactory2(any);
+  function any(...parameters) {
+    let index3 = -1;
+    while (++index3 < checks2.length) {
+      if (checks2[index3].apply(this, parameters)) return true;
+    }
+    return false;
+  }
+}
+function propertiesFactory2(check) {
+  const checkAsRecord = (
+    /** @type {Record<string, unknown>} */
+    check
+  );
+  return castFactory2(all5);
+  function all5(node) {
+    const nodeAsRecord = (
+      /** @type {Record<string, unknown>} */
+      /** @type {unknown} */
+      node
+    );
+    let key2;
+    for (key2 in check) {
+      if (nodeAsRecord[key2] !== checkAsRecord[key2]) return false;
+    }
+    return true;
+  }
+}
+function typeFactory2(check) {
+  return castFactory2(type);
+  function type(node) {
+    return node && node.type === check;
+  }
+}
+function castFactory2(testFunction) {
+  return check;
+  function check(value, index2, parent) {
+    return Boolean(
+      looksLikeANode2(value) && testFunction.call(
+        this,
+        value,
+        typeof index2 === "number" ? index2 : void 0,
+        parent || void 0
+      )
+    );
+  }
+}
 function ok2() {
+  return true;
+}
+function looksLikeANode2(value) {
+  return value !== null && typeof value === "object" && "type" in value;
+}
+
+// node_modules/unist-util-visit-parents/lib/color.node.js
+function color2(d) {
+  return "\x1B[33m" + d + "\x1B[39m";
+}
+
+// node_modules/unist-util-visit-parents/lib/index.js
+var empty2 = [];
+var CONTINUE2 = true;
+var EXIT2 = false;
+var SKIP2 = "skip";
+function visitParents2(tree, test, visitor, reverse) {
+  let check;
+  if (typeof test === "function" && typeof visitor !== "function") {
+    reverse = visitor;
+    visitor = test;
+  } else {
+    check = test;
+  }
+  const is2 = convert2(check);
+  const step = reverse ? -1 : 1;
+  factory(tree, void 0, [])();
+  function factory(node, index2, parents) {
+    const value = (
+      /** @type {Record<string, unknown>} */
+      node && typeof node === "object" ? node : {}
+    );
+    if (typeof value.type === "string") {
+      const name = (
+        // `hast`
+        typeof value.tagName === "string" ? value.tagName : (
+          // `xast`
+          typeof value.name === "string" ? value.name : void 0
+        )
+      );
+      Object.defineProperty(visit3, "name", {
+        value: "node (" + color2(node.type + (name ? "<" + name + ">" : "")) + ")"
+      });
+    }
+    return visit3;
+    function visit3() {
+      let result = empty2;
+      let subresult;
+      let offset;
+      let grandparents;
+      if (!test || is2(node, index2, parents[parents.length - 1] || void 0)) {
+        result = toResult2(visitor(node, parents));
+        if (result[0] === EXIT2) {
+          return result;
+        }
+      }
+      if ("children" in node && node.children) {
+        const nodeAsParent = (
+          /** @type {UnistParent} */
+          node
+        );
+        if (nodeAsParent.children && result[0] !== SKIP2) {
+          offset = (reverse ? nodeAsParent.children.length : -1) + step;
+          grandparents = parents.concat(nodeAsParent);
+          while (offset > -1 && offset < nodeAsParent.children.length) {
+            const child = nodeAsParent.children[offset];
+            subresult = factory(child, offset, grandparents)();
+            if (subresult[0] === EXIT2) {
+              return subresult;
+            }
+            offset = typeof subresult[1] === "number" ? subresult[1] : offset + step;
+          }
+        }
+      }
+      return result;
+    }
+  }
+}
+function toResult2(value) {
+  if (Array.isArray(value)) {
+    return value;
+  }
+  if (typeof value === "number") {
+    return [CONTINUE2, value];
+  }
+  return value === null || value === void 0 ? empty2 : [value];
+}
+
+// node_modules/unist-util-visit/lib/index.js
+function visit2(tree, testOrVisitor, visitorOrReverse, maybeReverse) {
+  let reverse;
+  let test;
+  let visitor;
+  if (typeof testOrVisitor === "function" && typeof visitorOrReverse !== "function") {
+    test = void 0;
+    visitor = testOrVisitor;
+    reverse = visitorOrReverse;
+  } else {
+    test = testOrVisitor;
+    visitor = visitorOrReverse;
+    reverse = maybeReverse;
+  }
+  visitParents2(tree, test, overload, reverse);
+  function overload(node, parents) {
+    const parent = parents[parents.length - 1];
+    const index2 = parent ? parent.children.indexOf(node) : void 0;
+    return visitor(node, index2, parent);
+  }
+}
+
+// node_modules/devlop/lib/default.js
+function ok3() {
 }
 
 // node_modules/property-information/lib/util/schema.js
@@ -2619,7 +2859,7 @@ function createLocation(state, node, location2) {
           }
         }
       }
-      ok2(location2.startTag);
+      ok3(location2.startTag);
       const opening2 = position(location2.startTag);
       const closing2 = location2.endTag ? position(location2.endTag) : void 0;
       const data = { opening: opening2 };
@@ -11546,7 +11786,7 @@ var applyBlockId = (node, blockId, blocks) => {
 var blockReferences = (tree, file) => {
   const data = ensureFileData(file);
   const blocks = data.blocks;
-  visit(
+  visit2(
     tree,
     "element",
     (node, index2, parent) => {
@@ -11596,7 +11836,7 @@ var blockReferences = (tree, file) => {
 };
 var isElement2 = (node) => typeof node === "object" && node !== null && node.type === "element";
 var checkbox = (tree) => {
-  visit(tree, "element", (node) => {
+  visit2(tree, "element", (node) => {
     if (!isElement2(node) || node.tagName !== "input") return;
     if (!node.properties || node.properties.type !== "checkbox") return;
     const properties = node.properties;
@@ -11608,7 +11848,7 @@ var checkbox = (tree) => {
       className: "checkbox-toggle"
     };
   });
-  visit(tree, "element", (node) => {
+  visit2(tree, "element", (node) => {
     if (!isElement2(node) || node.tagName !== "li") return;
     if (!node.properties) return;
     const className = node.properties.className;
@@ -11693,7 +11933,7 @@ var mermaidContainer = () => ({
   ]
 });
 var mermaidExpand = (tree) => {
-  visit(
+  visit2(
     tree,
     "element",
     (node, _index, parent) => {
@@ -11706,7 +11946,7 @@ var mermaidExpand = (tree) => {
 };
 var isElement4 = (node) => typeof node === "object" && node !== null && node.type === "element";
 var obsidianUri = (tree) => {
-  visit(tree, "element", (node) => {
+  visit2(tree, "element", (node) => {
     if (!isElement4(node) || node.tagName !== "a") return;
     if (!node.properties) return;
     const href = node.properties.href;
@@ -11726,7 +11966,7 @@ var isElement5 = (node) => typeof node === "object" && node !== null && node.typ
 var isParent3 = (node) => typeof node === "object" && node !== null && Array.isArray(node.children);
 function collectTweetNodes(tree) {
   const tweets = [];
-  visit(
+  visit2(
     tree,
     "element",
     (node, index2, parent) => {
@@ -11812,7 +12052,7 @@ var youTubePlaylistRegex = /[?&]list=([^#?&]*)/;
 var isElement6 = (node) => typeof node === "object" && node !== null && node.type === "element";
 var isParent4 = (node) => typeof node === "object" && node !== null && Array.isArray(node.children);
 var youTubeEmbed = (tree) => {
-  visit(
+  visit2(
     tree,
     "element",
     (node, index2, parent) => {
@@ -12242,8 +12482,8 @@ function all2(children, parentNode, schema) {
 function patch2(from, to) {
   const position4 = from.position;
   if (position4 && position4.start && position4.end) {
-    ok2(typeof position4.start.offset === "number");
-    ok2(typeof position4.end.offset === "number");
+    ok3(typeof position4.start.offset === "number");
+    ok3(typeof position4.end.offset === "number");
     to.sourceCodeLocation = {
       startLine: position4.start.line,
       startCol: position4.start.column,
@@ -12335,7 +12575,7 @@ function raw(tree, options) {
     file: state.options.file
   });
   if (state.stitches) {
-    visit(result, "comment", function(node, index2, parent) {
+    visit2(result, "comment", function(node, index2, parent) {
       const stitch2 = (
         /** @type {Stitch} */
         /** @type {unknown} */
@@ -13316,7 +13556,7 @@ function createState(tree, options) {
     patch: patch3,
     wrap
   };
-  visit(tree, function(node) {
+  visit2(tree, function(node) {
     if (node.type === "definition" || node.type === "footnoteDefinition") {
       const map = node.type === "definition" ? definitionById : footnoteById;
       const id = String(node.identifier).toUpperCase();
@@ -13983,9 +14223,9 @@ function ccount(value, character) {
 // node_modules/hast-util-whitespace/lib/index.js
 var re = /[ \t\n\f\r]/g;
 function whitespace(thing) {
-  return typeof thing === "object" ? thing.type === "text" ? empty2(thing.value) : false : empty2(thing);
+  return typeof thing === "object" ? thing.type === "text" ? empty3(thing.value) : false : empty3(thing);
 }
-function empty2(value) {
+function empty3(value) {
   return value.replace(re, "") === "";
 }
 
@@ -14469,7 +14709,7 @@ var ObsidianFlavoredMarkdown = (userOpts) => {
         return (tree, file) => {
           const base2 = pathToRoot(file.data.slug);
           if (opts.wikilinks) {
-            visit(
+            visit2(
               tree,
               (node) => node.type === "wikilink",
               (node, index2, parent) => {
@@ -14483,7 +14723,7 @@ var ObsidianFlavoredMarkdown = (userOpts) => {
                 if (wikilinkNode.embedded) {
                   const ext = default2.extname(fp).toLowerCase();
                   const url = slugifyFilePath(fp);
-                  if ([".png", ".jpg", ".jpeg", ".gif", ".bmp", ".svg", ".webp"].includes(ext)) {
+                  if ([".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp"].includes(ext)) {
                     const match = wikilinkImageEmbedRegex.exec(alias ?? "");
                     const alt = match?.groups?.alt ?? "";
                     const width = match?.groups?.width ?? "auto";
@@ -14501,6 +14741,15 @@ var ObsidianFlavoredMarkdown = (userOpts) => {
                       }
                     };
                     replacement = imageNode;
+                  } else if (ext === ".svg") {
+                    const match = wikilinkImageEmbedRegex.exec(alias ?? "");
+                    const alt = match?.groups?.alt ?? "";
+                    const width = match?.groups?.width ?? "auto";
+                    const height = match?.groups?.height ?? "auto";
+                    replacement = {
+                      type: "html",
+                      value: `<object data="${url}" type="image/svg+xml" width="${width}" height="${height}" aria-label="${alt}"></object>`
+                    };
                   } else if ([".mp4", ".webm", ".ogv", ".mov", ".mkv"].includes(ext)) {
                     replacement = {
                       type: "html",
@@ -14559,12 +14808,12 @@ var ObsidianFlavoredMarkdown = (userOpts) => {
                   replacement = linkNode;
                 }
                 parent.children[index2] = replacement;
-                return SKIP;
+                return SKIP2;
               }
             );
           }
           if (opts.highlight) {
-            visit(
+            visit2(
               tree,
               (node) => node.type === "highlight",
               (node, index2, parent) => {
@@ -14575,12 +14824,12 @@ var ObsidianFlavoredMarkdown = (userOpts) => {
                   type: "html",
                   value: `<span class="text-highlight">${text5}</span>`
                 };
-                return SKIP;
+                return SKIP2;
               }
             );
           }
           if (opts.parseTags) {
-            visit(
+            visit2(
               tree,
               (node) => node.type === "tag",
               (node, index2, parent) => {
@@ -14591,7 +14840,7 @@ var ObsidianFlavoredMarkdown = (userOpts) => {
                     type: "text",
                     value: `#${tagNode.value ?? ""}`
                   };
-                  return SKIP;
+                  return SKIP2;
                 }
                 const tag = slugTag(tagNode.value);
                 if (file.data.frontmatter) {
@@ -14610,12 +14859,12 @@ var ObsidianFlavoredMarkdown = (userOpts) => {
                   children: [{ type: "text", value: tag }]
                 };
                 parent.children[index2] = tagLink;
-                return SKIP;
+                return SKIP2;
               }
             );
           }
           if (opts.enableInHtmlEmbed) {
-            visit(tree, "html", (node) => {
+            visit2(tree, "html", (node) => {
               if (opts.wikilinks) {
                 node.value = node.value.replace(
                   wikilinkRegex,
@@ -14659,14 +14908,14 @@ var ObsidianFlavoredMarkdown = (userOpts) => {
       if (opts.enableVideoEmbed) {
         plugins.push(() => {
           return (tree, _file) => {
-            visit(tree, "image", (node, index2, parent) => {
+            visit2(tree, "image", (node, index2, parent) => {
               if (parent && index2 !== void 0 && videoExtensionRegex.test(node.url)) {
                 const newNode = {
                   type: "html",
                   value: `<video controls src="${node.url}"></video>`
                 };
                 parent.children.splice(index2, 1, newNode);
-                return SKIP;
+                return SKIP2;
               }
             });
           };
@@ -14675,7 +14924,7 @@ var ObsidianFlavoredMarkdown = (userOpts) => {
       if (opts.callouts) {
         plugins.push(() => {
           return (tree, _file) => {
-            visit(tree, "blockquote", (node) => {
+            visit2(tree, "blockquote", (node) => {
               if (node.children.length === 0) {
                 return;
               }
@@ -14769,7 +15018,7 @@ var ObsidianFlavoredMarkdown = (userOpts) => {
       if (opts.mermaid) {
         plugins.push(() => {
           return (tree, file) => {
-            visit(tree, "code", (node) => {
+            visit2(tree, "code", (node) => {
               if (node.lang === "mermaid") {
                 file.data.hasMermaidDiagram = true;
                 node.data = {
