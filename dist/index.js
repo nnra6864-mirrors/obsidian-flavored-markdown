@@ -565,6 +565,13 @@ function tokenizeFlow(effects, ok22, nok) {
     if (code2 === null) {
       return abandon(code2);
     }
+    if (isLineEnding3(code2)) {
+      return effects.attempt(
+        nonLazyContinuation,
+        beforeContentChunk,
+        abandon
+      )(code2);
+    }
     if (code2 === PERCENT) {
       return effects.attempt(flowClose, closeAfter, startContent)(code2);
     }
@@ -796,7 +803,7 @@ function commentFromMarkdown() {
     exit: {
       commentContent(token) {
         const node = this.stack[this.stack.length - 1];
-        node.value = this.sliceSerialize(token);
+        node.value += this.sliceSerialize(token);
       },
       comment(token) {
         this.exit(token);
