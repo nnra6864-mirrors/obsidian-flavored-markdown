@@ -12,7 +12,6 @@ import type {
   Link,
 } from "mdast";
 import type { Node } from "unist";
-import type { Element, Root as HtmlRoot } from "hast";
 import type { PluggableList } from "unified";
 import type { QuartzTransformerPlugin, JSResource, CSSResource } from "@quartz-community/types";
 import path from "path";
@@ -617,11 +616,3 @@ export const ObsidianFlavoredMarkdown: QuartzTransformerPlugin<
     },
   };
 };
-
-declare module "vfile" {
-  interface DataMap {
-    blocks: Record<string, Element>;
-    htmlAst: HtmlRoot;
-    hasMermaidDiagram: boolean | undefined;
-  }
-}
