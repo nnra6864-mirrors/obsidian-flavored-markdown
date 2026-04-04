@@ -18,7 +18,8 @@ export default {
         quote: "Alıntı",
       },
       transcludes: {
-        transcludeOf: ({ targetSlug }: { targetSlug: string }) => `${targetSlug} sayfasından alıntı`,
+        transcludeOf: ({ targetSlug }: { targetSlug: string }) =>
+          `${targetSlug} sayfasından alıntı`,
         linkToOriginal: "Orijinal bağlantı",
       },
     },

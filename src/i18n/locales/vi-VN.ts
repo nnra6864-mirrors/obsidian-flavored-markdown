@@ -18,7 +18,8 @@ export default {
         quote: "Trích dẫn",
       },
       transcludes: {
-        transcludeOf: ({ targetSlug }: { targetSlug: string }) => `Trích dẫn toàn bộ từ ${targetSlug}`,
+        transcludeOf: ({ targetSlug }: { targetSlug: string }) =>
+          `Trích dẫn toàn bộ từ ${targetSlug}`,
         linkToOriginal: "Xem trang gốc",
       },
     },
