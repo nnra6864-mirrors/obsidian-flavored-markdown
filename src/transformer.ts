@@ -253,10 +253,12 @@ export const ObsidianFlavoredMarkdown: QuartzTransformerPlugin<
                       value: `<iframe src="${url}" class="pdf"></iframe>`,
                     };
                   } else {
-                    // For page transclusions (e.g. ![[file.canvas]]), strip the file extension
-                    // so the embed URL targets the virtual page slug (which has no extension)
-                    // rather than the raw source file path.
-                    const transcludeUrl = slugifyFilePath(fp as FilePath, true);
+                    // Keep the file extension for virtual page transclusions (e.g.
+                    // ![[file.canvas]], ![[file.base]]) so CrawlLinks can resolve
+                    // the target unambiguously against allSlugs. Only strip .md
+                    // since Markdown files never have extensions in their slugs.
+                    const stripExt = ext === ".md";
+                    const transcludeUrl = slugifyFilePath(fp as FilePath, stripExt);
                     const block = anchor ? `#${anchor}` : "";
                     replacement = {
                       type: "html",

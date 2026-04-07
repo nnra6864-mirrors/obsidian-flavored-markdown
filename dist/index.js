@@ -14783,7 +14783,8 @@ var ObsidianFlavoredMarkdown = (userOpts) => {
                       value: `<iframe src="${url}" class="pdf"></iframe>`
                     };
                   } else {
-                    const transcludeUrl = slugifyFilePath(fp, true);
+                    const stripExt = ext === ".md";
+                    const transcludeUrl = slugifyFilePath(fp, stripExt);
                     const block = anchor ? `#${anchor}` : "";
                     replacement = {
                       type: "html",
