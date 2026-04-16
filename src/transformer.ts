@@ -45,7 +45,6 @@ export interface ObsidianFlavoredMarkdownOptions {
   enableVideoEmbed: boolean;
   enableCheckbox: boolean;
   enableObsidianUri: boolean;
-  disableBrokenWikilinks: boolean;
 }
 
 const defaultOptions: ObsidianFlavoredMarkdownOptions = {
@@ -62,7 +61,6 @@ const defaultOptions: ObsidianFlavoredMarkdownOptions = {
   enableVideoEmbed: true,
   enableCheckbox: false,
   enableObsidianUri: true,
-  disableBrokenWikilinks: false,
 };
 
 const calloutMapping = {
@@ -172,7 +170,7 @@ export const ObsidianFlavoredMarkdown: QuartzTransformerPlugin<
 
       return src;
     },
-    markdownPlugins(ctx) {
+    markdownPlugins(_ctx) {
       const plugins: PluggableList = [];
 
       plugins.push([
@@ -275,24 +273,6 @@ export const ObsidianFlavoredMarkdown: QuartzTransformerPlugin<
                     children: [{ type: "text", value: alias ?? fp }],
                   };
                   replacement = linkNode;
-                } else if (opts.disableBrokenWikilinks) {
-                  const slug = slugifyFilePath(fp as FilePath);
-                  const exists =
-                    ctx.allSlugs && ctx.allSlugs.includes(slug as (typeof ctx.allSlugs)[number]);
-                  if (!exists) {
-                    replacement = {
-                      type: "html",
-                      value: `<a class="internal broken">${alias ?? fp}</a>`,
-                    };
-                  } else {
-                    const anchorPart = anchor ? `#${anchor}` : "";
-                    const linkNode: Link = {
-                      type: "link",
-                      url: fp + anchorPart,
-                      children: [{ type: "text", value: alias ?? fp }],
-                    };
-                    replacement = linkNode;
-                  }
                 } else {
                   const anchorPart = anchor ? `#${anchor}` : "";
                   const linkNode: Link = {

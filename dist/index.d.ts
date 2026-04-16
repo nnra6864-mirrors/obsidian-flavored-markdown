@@ -15,7 +15,6 @@ interface ObsidianFlavoredMarkdownOptions {
     enableVideoEmbed: boolean;
     enableCheckbox: boolean;
     enableObsidianUri: boolean;
-    disableBrokenWikilinks: boolean;
 }
 declare const ObsidianFlavoredMarkdown: QuartzTransformerPlugin<Partial<ObsidianFlavoredMarkdownOptions>>;
 

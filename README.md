@@ -32,21 +32,20 @@ ExternalPlugin.ObsidianFlavoredMarkdown({
 
 ## Configuration
 
-| Option                   | Type      | Default | Description                                 |
-| ------------------------ | --------- | ------- | ------------------------------------------- |
-| `comments`               | `boolean` | `true`  | Whether to parse Obsidian-style comments.   |
-| `highlight`              | `boolean` | `true`  | Whether to parse Obsidian-style highlights. |
-| `wikilinks`              | `boolean` | `true`  | Whether to parse wikilinks.                 |
-| `callouts`               | `boolean` | `true`  | Whether to parse callouts.                  |
-| `mermaid`                | `boolean` | `true`  | Whether to parse Mermaid diagrams.          |
-| `parseTags`              | `boolean` | `true`  | Whether to parse tags.                      |
-| `parseArrows`            | `boolean` | `true`  | Whether to parse arrows.                    |
-| `parseBlockReferences`   | `boolean` | `true`  | Whether to parse block references.          |
-| `enableInHtmlEmbed`      | `boolean` | `false` | Whether to enable parsing in HTML embeds.   |
-| `enableYouTubeEmbed`     | `boolean` | `true`  | Whether to enable YouTube embeds.           |
-| `enableVideoEmbed`       | `boolean` | `true`  | Whether to enable video embeds.             |
-| `enableCheckbox`         | `boolean` | `false` | Whether to enable checkboxes.               |
-| `disableBrokenWikilinks` | `boolean` | `false` | Whether to disable broken wikilinks.        |
+| Option                 | Type      | Default | Description                                 |
+| ---------------------- | --------- | ------- | ------------------------------------------- |
+| `comments`             | `boolean` | `true`  | Whether to parse Obsidian-style comments.   |
+| `highlight`            | `boolean` | `true`  | Whether to parse Obsidian-style highlights. |
+| `wikilinks`            | `boolean` | `true`  | Whether to parse wikilinks.                 |
+| `callouts`             | `boolean` | `true`  | Whether to parse callouts.                  |
+| `mermaid`              | `boolean` | `true`  | Whether to parse Mermaid diagrams.          |
+| `parseTags`            | `boolean` | `true`  | Whether to parse tags.                      |
+| `parseArrows`          | `boolean` | `true`  | Whether to parse arrows.                    |
+| `parseBlockReferences` | `boolean` | `true`  | Whether to parse block references.          |
+| `enableInHtmlEmbed`    | `boolean` | `false` | Whether to enable parsing in HTML embeds.   |
+| `enableYouTubeEmbed`   | `boolean` | `true`  | Whether to enable YouTube embeds.           |
+| `enableVideoEmbed`     | `boolean` | `true`  | Whether to enable video embeds.             |
+| `enableCheckbox`       | `boolean` | `false` | Whether to enable checkboxes.               |
 
 ## Documentation
 

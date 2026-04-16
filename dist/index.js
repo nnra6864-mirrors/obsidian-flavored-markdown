@@ -24262,8 +24262,7 @@ var defaultOptions3 = {
   enableTweetEmbed: true,
   enableVideoEmbed: true,
   enableCheckbox: false,
-  enableObsidianUri: true,
-  disableBrokenWikilinks: false
+  enableObsidianUri: true
 };
 var calloutMapping = {
   note: "note",
@@ -24331,7 +24330,7 @@ var ObsidianFlavoredMarkdown = (userOpts) => {
       }
       return src;
     },
-    markdownPlugins(ctx) {
+    markdownPlugins(_ctx) {
       const plugins = [];
       plugins.push([
         remarkObsidian,
@@ -24420,23 +24419,6 @@ var ObsidianFlavoredMarkdown = (userOpts) => {
                     children: [{ type: "text", value: alias ?? fp }]
                   };
                   replacement = linkNode;
-                } else if (opts.disableBrokenWikilinks) {
-                  const slug = slugifyFilePath(fp);
-                  const exists = ctx.allSlugs && ctx.allSlugs.includes(slug);
-                  if (!exists) {
-                    replacement = {
-                      type: "html",
-                      value: `<a class="internal broken">${alias ?? fp}</a>`
-                    };
-                  } else {
-                    const anchorPart = anchor ? `#${anchor}` : "";
-                    const linkNode = {
-                      type: "link",
-                      url: fp + anchorPart,
-                      children: [{ type: "text", value: alias ?? fp }]
-                    };
-                    replacement = linkNode;
-                  }
                 } else {
                   const anchorPart = anchor ? `#${anchor}` : "";
                   const linkNode = {
