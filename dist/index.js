@@ -2,6 +2,7 @@ import default2 from 'path';
 import default3 from 'process';
 import { fileURLToPath } from 'url';
 import { pathToRoot, slugifyFilePath, slugTag, capitalize } from '@quartz-community/utils';
+import { slug } from 'github-slugger';
 
 var __defProp = Object.defineProperty;
 var __export = (target, all6) => {
@@ -24405,7 +24406,8 @@ var ObsidianFlavoredMarkdown = (userOpts) => {
                   } else {
                     const stripExt = ext === ".md";
                     const transcludeUrl = slugifyFilePath(fp, stripExt);
-                    const block = anchor ? `#${anchor}` : "";
+                    const isBlockRef = anchor.startsWith("^");
+                    const block = anchor ? `#${isBlockRef ? anchor : slug(anchor)}` : "";
                     replacement = {
                       type: "html",
                       data: { hProperties: { transclude: true } },

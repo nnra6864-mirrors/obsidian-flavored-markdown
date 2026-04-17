@@ -61,7 +61,8 @@
     "@quartz-community/rehype-obsidian": "github:quartz-community/rehype-obsidian",
     "@quartz-community/remark-obsidian": "github:quartz-community/remark-obsidian",
     "@quartz-community/types": "github:quartz-community/types",
-    "@quartz-community/utils": "github:quartz-community/utils"
+    "@quartz-community/utils": "github:quartz-community/utils",
+    "github-slugger": "^2.0.0"
   },
   "devDependencies": {
     "@types/hast": "^3.0.4",
@@ -71,7 +72,6 @@
     "@typescript-eslint/parser": "^7.18.0",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
-    "github-slugger": "^2.0.0",
     "hast": "^1.0.0",
     "hast-util-to-html": "^9.0.5",
     "hast-util-to-jsx-runtime": "^2.3.6",

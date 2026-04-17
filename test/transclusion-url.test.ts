@@ -62,6 +62,52 @@ function transformTree(tree: Root): Node {
   return (tree.children[0] as Paragraph).children[0] as unknown as Node;
 }
 
+describe("transclusion heading anchor handling", () => {
+  it("slugifies heading anchors in data-block to match rehype-slug ids", () => {
+    const tree = makeTree({
+      path: "philosophy.md",
+      heading: "A garden should be your own",
+      embedded: true,
+    });
+    const result = transformTree(tree) as Html;
+
+    expect(result.type).toBe("html");
+    expect(result.value).toContain('data-block="#a-garden-should-be-your-own"');
+  });
+
+  it("slugifies single-word heading anchors", () => {
+    const tree = makeTree({ path: "layout.md", heading: "Style", embedded: true });
+    const result = transformTree(tree) as Html;
+
+    expect(result.type).toBe("html");
+    expect(result.value).toContain('data-block="#style"');
+  });
+
+  it("does not slugify block references", () => {
+    const tree = makeTree({ path: "note.md", heading: "^myBlock123", embedded: true });
+    const result = transformTree(tree) as Html;
+
+    expect(result.type).toBe("html");
+    expect(result.value).toContain('data-block="#^myBlock123"');
+  });
+
+  it("produces empty data-block when no heading is provided", () => {
+    const tree = makeTree({ path: "index.md", embedded: true });
+    const result = transformTree(tree) as Html;
+
+    expect(result.type).toBe("html");
+    expect(result.value).toContain('data-block=""');
+  });
+
+  it("slugifies heading anchors with special characters", () => {
+    const tree = makeTree({ path: "note.md", heading: "What's new in v2.0?", embedded: true });
+    const result = transformTree(tree) as Html;
+
+    expect(result.type).toBe("html");
+    expect(result.value).toContain('data-block="#whats-new-in-v20"');
+  });
+});
+
 describe("transclusion URL handling", () => {
   it("preserves .base extension in transclusion URLs", () => {
     const tree = makeTree({ path: "graph.base", embedded: true });

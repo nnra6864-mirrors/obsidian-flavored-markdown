@@ -20,6 +20,7 @@ import rehypeObsidian from "@quartz-community/rehype-obsidian";
 import rehypeRaw from "rehype-raw";
 import { SKIP, visit } from "unist-util-visit";
 import { pathToRoot, slugTag, slugifyFilePath, capitalize } from "@quartz-community/utils";
+import { slug as githubSlug } from "github-slugger";
 import type { FilePath, FullSlug } from "@quartz-community/utils";
 // @ts-expect-error -- inline script import
 import calloutScript from "./scripts/callout.inline";
@@ -257,7 +258,11 @@ export const ObsidianFlavoredMarkdown: QuartzTransformerPlugin<
                     // since Markdown files never have extensions in their slugs.
                     const stripExt = ext === ".md";
                     const transcludeUrl = slugifyFilePath(fp as FilePath, stripExt);
-                    const block = anchor ? `#${anchor}` : "";
+                    // Block references (^id) use exact key lookup — keep as-is.
+                    // Heading anchors must be slugified to match the ids that
+                    // rehype-slug generates on heading elements.
+                    const isBlockRef = anchor.startsWith("^");
+                    const block = anchor ? `#${isBlockRef ? anchor : githubSlug(anchor)}` : "";
                     replacement = {
                       type: "html",
                       data: { hProperties: { transclude: true } },
