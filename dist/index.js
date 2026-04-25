@@ -24583,7 +24583,7 @@ var ObsidianFlavoredMarkdown = (userOpts) => {
                   ]
                 };
                 const title = mdastToHtml(titleNode);
-                const toggleIcon = `<div class="fold-callout-icon"></div>`;
+                const toggleIcon = `<div class="fold-callout-icon callout-fold"></div>`;
                 const titleHtml = {
                   type: "html",
                   value: `<div
