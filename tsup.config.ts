@@ -43,6 +43,18 @@ const inlineScriptPlugin: Plugin = {
   },
 };
 
+const SINGLETON_EXTERNALS = [
+  "preact",
+  "preact/hooks",
+  "preact/jsx-runtime",
+  "preact/compat",
+  "@jackyzha0/quartz",
+  "@jackyzha0/quartz/*",
+  "vfile",
+  "vfile/*",
+  "unified",
+];
+
 export default defineConfig({
   entry: {
     index: "src/index.ts",
@@ -57,7 +69,8 @@ export default defineConfig({
   splitting: false,
   outDir: "dist",
   platform: "node",
-  noExternal: ["@quartz-community/remark-obsidian", "@quartz-community/rehype-obsidian"],
+  noExternal: [/.*/],
+  external: SINGLETON_EXTERNALS,
   esbuildOptions(options) {
     options.jsx = "automatic";
     options.jsxImportSource = "preact";
