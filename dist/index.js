@@ -232,7 +232,7 @@ function wikilinkSyntax() {
     }
   };
 }
-function tokenize(effects, ok23, nok) {
+function tokenize(effects, ok32, nok) {
   let hasPath = false;
   let hasHeading = false;
   let hasAlias = false;
@@ -384,7 +384,7 @@ function tokenize(effects, ok23, nok) {
     effects.consume(code2);
     effects.exit("wikilinkMarker");
     effects.exit("wikilink");
-    return ok23;
+    return ok32;
   }
 }
 var EQUALS = 61;
@@ -398,7 +398,7 @@ function highlightSyntax() {
     }
   };
 }
-function tokenize2(effects, ok23, nok) {
+function tokenize2(effects, ok32, nok) {
   const close = { tokenize: tokenizeClose, partial: true };
   let hasContent = false;
   return start;
@@ -449,7 +449,7 @@ function tokenize2(effects, ok23, nok) {
   }
   function closeAfter(code2) {
     effects.exit("highlight");
-    return ok23(code2);
+    return ok32(code2);
   }
 }
 var PERCENT = 37;
@@ -478,7 +478,7 @@ function commentSyntax() {
     }
   };
 }
-function tokenizeText(effects, ok23, nok) {
+function tokenizeText(effects, ok32, nok) {
   const close = { tokenize: tokenizeClose, partial: true };
   return start;
   function start(code2) {
@@ -525,10 +525,10 @@ function tokenizeText(effects, ok23, nok) {
   }
   function closeAfter(code2) {
     effects.exit("comment");
-    return ok23(code2);
+    return ok32(code2);
   }
 }
-function tokenizeFlow(effects, ok23, nok) {
+function tokenizeFlow(effects, ok32, nok) {
   const self2 = this;
   const flowClose = {
     tokenize: tokenizeFlowClose,
@@ -605,7 +605,7 @@ function tokenizeFlow(effects, ok23, nok) {
   }
   function closeAfter(code2) {
     effects.exit("comment");
-    return ok23(code2);
+    return ok32(code2);
   }
   function abandon(code2) {
     effects.exit("comment");
@@ -639,12 +639,12 @@ function tokenizeFlow(effects, ok23, nok) {
     }
   }
 }
-function tokenizeNonLazyContinuation(effects, ok23, nok) {
+function tokenizeNonLazyContinuation(effects, ok32, nok) {
   const self2 = this;
   return start;
   function start(code2) {
     if (code2 === null) {
-      return ok23(code2);
+      return ok32(code2);
     }
     if (!isLineEnding3(code2)) return nok(code2);
     effects.enter("lineEnding");
@@ -653,7 +653,7 @@ function tokenizeNonLazyContinuation(effects, ok23, nok) {
     return lineStart;
   }
   function lineStart(code2) {
-    return self2.parser.lazy[self2.now().line] ? nok(code2) : ok23(code2);
+    return self2.parser.lazy[self2.now().line] ? nok(code2) : ok32(code2);
   }
 }
 var HASH2 = 35;
@@ -681,13 +681,13 @@ function tagSyntax() {
     }
   };
 }
-function tokenize3(effects, ok23, nok) {
+function tokenize3(effects, ok32, nok) {
   let hasNonDigit = false;
   const context = this;
   return start;
   function start(code2) {
-    const previous = context.previous;
-    const allowedStart = previous === null || isWhitespace(previous) || previous === HASH2;
+    const previous2 = context.previous;
+    const allowedStart = previous2 === null || isWhitespace(previous2) || previous2 === HASH2;
     if (!allowedStart) return nok(code2);
     if (code2 !== HASH2) return nok(code2);
     effects.enter("tag");
@@ -725,7 +725,7 @@ function tokenize3(effects, ok23, nok) {
     if (!hasNonDigit) return nok(code2);
     effects.exit("tagContent");
     effects.exit("tag");
-    return ok23(code2);
+    return ok32(code2);
   }
 }
 function wikilinkFromMarkdown() {
@@ -911,12 +911,507 @@ function customTaskCharTransform(tree, source) {
     }
   });
 }
+function markdownLineEnding(code2) {
+  return code2 !== null && code2 < -2;
+}
+function markdownSpace(code2) {
+  return code2 === -2 || code2 === -1 || code2 === 32;
+}
+function factorySpace(effects, ok32, type, max) {
+  const limit = max ? max - 1 : Number.POSITIVE_INFINITY;
+  let size = 0;
+  return start;
+  function start(code2) {
+    if (markdownSpace(code2)) {
+      effects.enter(type);
+      return prefix(code2);
+    }
+    return ok32(code2);
+  }
+  function prefix(code2) {
+    if (markdownSpace(code2) && size++ < limit) {
+      effects.consume(code2);
+      return prefix;
+    }
+    effects.exit(type);
+    return ok32(code2);
+  }
+}
+var mathFlow = {
+  tokenize: tokenizeMathFenced,
+  concrete: true,
+  name: "mathFlow"
+};
+var nonLazyContinuation2 = {
+  tokenize: tokenizeNonLazyContinuation2,
+  partial: true
+};
+function tokenizeMathFenced(effects, ok32, nok) {
+  const self2 = this;
+  const tail = self2.events[self2.events.length - 1];
+  const initialSize = tail && tail[1].type === "linePrefix" ? tail[2].sliceSerialize(tail[1], true).length : 0;
+  let sizeOpen = 0;
+  return start;
+  function start(code2) {
+    effects.enter("mathFlow");
+    effects.enter("mathFlowFence");
+    effects.enter("mathFlowFenceSequence");
+    return sequenceOpen(code2);
+  }
+  function sequenceOpen(code2) {
+    if (code2 === 36) {
+      effects.consume(code2);
+      sizeOpen++;
+      return sequenceOpen;
+    }
+    if (sizeOpen < 2) {
+      return nok(code2);
+    }
+    effects.exit("mathFlowFenceSequence");
+    return factorySpace(effects, metaBefore, "whitespace")(code2);
+  }
+  function metaBefore(code2) {
+    if (code2 === null || markdownLineEnding(code2)) {
+      return metaAfter(code2);
+    }
+    effects.enter("mathFlowFenceMeta");
+    effects.enter("chunkString", {
+      contentType: "string"
+    });
+    return meta(code2);
+  }
+  function meta(code2) {
+    if (code2 === null || markdownLineEnding(code2)) {
+      effects.exit("chunkString");
+      effects.exit("mathFlowFenceMeta");
+      return metaAfter(code2);
+    }
+    if (code2 === 36) {
+      return nok(code2);
+    }
+    effects.consume(code2);
+    return meta;
+  }
+  function metaAfter(code2) {
+    effects.exit("mathFlowFence");
+    if (self2.interrupt) {
+      return ok32(code2);
+    }
+    return effects.attempt(nonLazyContinuation2, beforeNonLazyContinuation, after)(code2);
+  }
+  function beforeNonLazyContinuation(code2) {
+    return effects.attempt({
+      tokenize: tokenizeClosingFence,
+      partial: true
+    }, after, contentStart)(code2);
+  }
+  function contentStart(code2) {
+    return (initialSize ? factorySpace(effects, beforeContentChunk, "linePrefix", initialSize + 1) : beforeContentChunk)(code2);
+  }
+  function beforeContentChunk(code2) {
+    if (code2 === null) {
+      return after(code2);
+    }
+    if (markdownLineEnding(code2)) {
+      return effects.attempt(nonLazyContinuation2, beforeNonLazyContinuation, after)(code2);
+    }
+    effects.enter("mathFlowValue");
+    return contentChunk(code2);
+  }
+  function contentChunk(code2) {
+    if (code2 === null || markdownLineEnding(code2)) {
+      effects.exit("mathFlowValue");
+      return beforeContentChunk(code2);
+    }
+    effects.consume(code2);
+    return contentChunk;
+  }
+  function after(code2) {
+    effects.exit("mathFlow");
+    return ok32(code2);
+  }
+  function tokenizeClosingFence(effects2, ok42, nok2) {
+    let size = 0;
+    return factorySpace(effects2, beforeSequenceClose, "linePrefix", self2.parser.constructs.disable.null.includes("codeIndented") ? void 0 : 4);
+    function beforeSequenceClose(code2) {
+      effects2.enter("mathFlowFence");
+      effects2.enter("mathFlowFenceSequence");
+      return sequenceClose(code2);
+    }
+    function sequenceClose(code2) {
+      if (code2 === 36) {
+        size++;
+        effects2.consume(code2);
+        return sequenceClose;
+      }
+      if (size < sizeOpen) {
+        return nok2(code2);
+      }
+      effects2.exit("mathFlowFenceSequence");
+      return factorySpace(effects2, afterSequenceClose, "whitespace")(code2);
+    }
+    function afterSequenceClose(code2) {
+      if (code2 === null || markdownLineEnding(code2)) {
+        effects2.exit("mathFlowFence");
+        return ok42(code2);
+      }
+      return nok2(code2);
+    }
+  }
+}
+function tokenizeNonLazyContinuation2(effects, ok32, nok) {
+  const self2 = this;
+  return start;
+  function start(code2) {
+    if (code2 === null) {
+      return ok32(code2);
+    }
+    effects.enter("lineEnding");
+    effects.consume(code2);
+    effects.exit("lineEnding");
+    return lineStart;
+  }
+  function lineStart(code2) {
+    return self2.parser.lazy[self2.now().line] ? nok(code2) : ok32(code2);
+  }
+}
+function mathText(options) {
+  const options_ = {};
+  let single = options_.singleDollarTextMath;
+  if (single === null || single === void 0) {
+    single = true;
+  }
+  return {
+    tokenize: tokenizeMathText,
+    resolve: resolveMathText,
+    previous,
+    name: "mathText"
+  };
+  function tokenizeMathText(effects, ok32, nok) {
+    let sizeOpen = 0;
+    let size;
+    let token;
+    return start;
+    function start(code2) {
+      effects.enter("mathText");
+      effects.enter("mathTextSequence");
+      return sequenceOpen(code2);
+    }
+    function sequenceOpen(code2) {
+      if (code2 === 36) {
+        effects.consume(code2);
+        sizeOpen++;
+        return sequenceOpen;
+      }
+      if (sizeOpen < 2 && !single) {
+        return nok(code2);
+      }
+      effects.exit("mathTextSequence");
+      return between(code2);
+    }
+    function between(code2) {
+      if (code2 === null) {
+        return nok(code2);
+      }
+      if (code2 === 36) {
+        token = effects.enter("mathTextSequence");
+        size = 0;
+        return sequenceClose(code2);
+      }
+      if (code2 === 32) {
+        effects.enter("space");
+        effects.consume(code2);
+        effects.exit("space");
+        return between;
+      }
+      if (markdownLineEnding(code2)) {
+        effects.enter("lineEnding");
+        effects.consume(code2);
+        effects.exit("lineEnding");
+        return between;
+      }
+      effects.enter("mathTextData");
+      return data(code2);
+    }
+    function data(code2) {
+      if (code2 === null || code2 === 32 || code2 === 36 || markdownLineEnding(code2)) {
+        effects.exit("mathTextData");
+        return between(code2);
+      }
+      effects.consume(code2);
+      return data;
+    }
+    function sequenceClose(code2) {
+      if (code2 === 36) {
+        effects.consume(code2);
+        size++;
+        return sequenceClose;
+      }
+      if (size === sizeOpen) {
+        effects.exit("mathTextSequence");
+        effects.exit("mathText");
+        return ok32(code2);
+      }
+      token.type = "mathTextData";
+      return data(code2);
+    }
+  }
+}
+function resolveMathText(events) {
+  let tailExitIndex = events.length - 4;
+  let headEnterIndex = 3;
+  let index2;
+  let enter;
+  if ((events[headEnterIndex][1].type === "lineEnding" || events[headEnterIndex][1].type === "space") && (events[tailExitIndex][1].type === "lineEnding" || events[tailExitIndex][1].type === "space")) {
+    index2 = headEnterIndex;
+    while (++index2 < tailExitIndex) {
+      if (events[index2][1].type === "mathTextData") {
+        events[tailExitIndex][1].type = "mathTextPadding";
+        events[headEnterIndex][1].type = "mathTextPadding";
+        headEnterIndex += 2;
+        tailExitIndex -= 2;
+        break;
+      }
+    }
+  }
+  index2 = headEnterIndex - 1;
+  tailExitIndex++;
+  while (++index2 <= tailExitIndex) {
+    if (enter === void 0) {
+      if (index2 !== tailExitIndex && events[index2][1].type !== "lineEnding") {
+        enter = index2;
+      }
+    } else if (index2 === tailExitIndex || events[index2][1].type === "lineEnding") {
+      events[enter][1].type = "mathTextData";
+      if (index2 !== enter + 2) {
+        events[enter][1].end = events[index2 - 1][1].end;
+        events.splice(enter + 2, index2 - enter - 2);
+        tailExitIndex -= index2 - enter - 2;
+        index2 = enter + 2;
+      }
+      enter = void 0;
+    }
+  }
+  return events;
+}
+function previous(code2) {
+  return code2 !== 36 || this.events[this.events.length - 1][1].type === "characterEscape";
+}
+function math(options) {
+  return {
+    flow: {
+      [36]: mathFlow
+    },
+    text: {
+      [36]: mathText()
+    }
+  };
+}
+function ok2() {
+}
+function longestStreak(value, substring) {
+  const source = String(value);
+  let index2 = source.indexOf(substring);
+  let expected = index2;
+  let count = 0;
+  let max = 0;
+  while (index2 !== -1) {
+    if (index2 === expected) {
+      if (++count > max) {
+        max = count;
+      }
+    } else {
+      count = 1;
+    }
+    expected = index2 + substring.length;
+    index2 = source.indexOf(substring, expected);
+  }
+  return max;
+}
+function mathFromMarkdown() {
+  return {
+    enter: {
+      mathFlow: enterMathFlow,
+      mathFlowFenceMeta: enterMathFlowMeta,
+      mathText: enterMathText
+    },
+    exit: {
+      mathFlow: exitMathFlow,
+      mathFlowFence: exitMathFlowFence,
+      mathFlowFenceMeta: exitMathFlowMeta,
+      mathFlowValue: exitMathData,
+      mathText: exitMathText,
+      mathTextData: exitMathData
+    }
+  };
+  function enterMathFlow(token) {
+    const code2 = {
+      type: "element",
+      tagName: "code",
+      properties: { className: ["language-math", "math-display"] },
+      children: []
+    };
+    this.enter(
+      {
+        type: "math",
+        meta: null,
+        value: "",
+        data: { hName: "pre", hChildren: [code2] }
+      },
+      token
+    );
+  }
+  function enterMathFlowMeta() {
+    this.buffer();
+  }
+  function exitMathFlowMeta() {
+    const data = this.resume();
+    const node = this.stack[this.stack.length - 1];
+    ok2(node.type === "math");
+    node.meta = data;
+  }
+  function exitMathFlowFence() {
+    if (this.data.mathFlowInside) return;
+    this.buffer();
+    this.data.mathFlowInside = true;
+  }
+  function exitMathFlow(token) {
+    const data = this.resume().replace(/^(\r?\n|\r)|(\r?\n|\r)$/g, "");
+    const node = this.stack[this.stack.length - 1];
+    ok2(node.type === "math");
+    this.exit(token);
+    node.value = data;
+    const code2 = (
+      /** @type {HastElement} */
+      node.data.hChildren[0]
+    );
+    ok2(code2.type === "element");
+    ok2(code2.tagName === "code");
+    code2.children.push({ type: "text", value: data });
+    this.data.mathFlowInside = void 0;
+  }
+  function enterMathText(token) {
+    this.enter(
+      {
+        type: "inlineMath",
+        value: "",
+        data: {
+          hName: "code",
+          hProperties: { className: ["language-math", "math-inline"] },
+          hChildren: []
+        }
+      },
+      token
+    );
+    this.buffer();
+  }
+  function exitMathText(token) {
+    const data = this.resume();
+    const node = this.stack[this.stack.length - 1];
+    ok2(node.type === "inlineMath");
+    this.exit(token);
+    node.value = data;
+    const children = (
+      /** @type {Array<HastElementContent>} */
+      // @ts-expect-error: we defined it in `enterMathFlow`.
+      node.data.hChildren
+    );
+    children.push({ type: "text", value: data });
+  }
+  function exitMathData(token) {
+    this.config.enter.data.call(this, token);
+    this.config.exit.data.call(this, token);
+  }
+}
+function mathToMarkdown(options) {
+  let single = ({}).singleDollarTextMath;
+  if (single === null || single === void 0) {
+    single = true;
+  }
+  inlineMath.peek = inlineMathPeek;
+  return {
+    unsafe: [
+      { character: "\r", inConstruct: "mathFlowMeta" },
+      { character: "\n", inConstruct: "mathFlowMeta" },
+      {
+        character: "$",
+        after: single ? void 0 : "\\$",
+        inConstruct: "phrasing"
+      },
+      { character: "$", inConstruct: "mathFlowMeta" },
+      { atBreak: true, character: "$", after: "\\$" }
+    ],
+    handlers: { math: math2, inlineMath }
+  };
+  function math2(node, _2, state, info) {
+    const raw3 = node.value || "";
+    const tracker = state.createTracker(info);
+    const sequence = "$".repeat(Math.max(longestStreak(raw3, "$") + 1, 2));
+    const exit = state.enter("mathFlow");
+    let value = tracker.move(sequence);
+    if (node.meta) {
+      const subexit = state.enter("mathFlowMeta");
+      value += tracker.move(
+        state.safe(node.meta, {
+          after: "\n",
+          before: value,
+          encode: ["$"],
+          ...tracker.current()
+        })
+      );
+      subexit();
+    }
+    value += tracker.move("\n");
+    if (raw3) {
+      value += tracker.move(raw3 + "\n");
+    }
+    value += tracker.move(sequence);
+    exit();
+    return value;
+  }
+  function inlineMath(node, _2, state) {
+    let value = node.value || "";
+    let size = 1;
+    if (!single) size++;
+    while (new RegExp("(^|[^$])" + "\\$".repeat(size) + "([^$]|$)").test(value)) {
+      size++;
+    }
+    const sequence = "$".repeat(size);
+    if (
+      // Contains non-space.
+      /[^ \r\n]/.test(value) && // Starts with space and ends with space.
+      (/^[ \r\n]/.test(value) && /[ \r\n]$/.test(value) || // Starts or ends with dollar.
+      /^\$|\$$/.test(value))
+    ) {
+      value = " " + value + " ";
+    }
+    let index2 = -1;
+    while (++index2 < state.unsafe.length) {
+      const pattern = state.unsafe[index2];
+      if (!pattern.atBreak) continue;
+      const expression = state.compilePattern(pattern);
+      let match;
+      while (match = expression.exec(value)) {
+        let position5 = match.index;
+        if (value.codePointAt(position5) === 10 && value.codePointAt(position5 - 1) === 13) {
+          position5--;
+        }
+        value = value.slice(0, position5) + " " + value.slice(match.index + 1);
+      }
+    }
+    return sequence + value + sequence;
+  }
+  function inlineMathPeek() {
+    return "$";
+  }
+}
 var defaultOptions = {
   wikilinks: true,
   highlights: true,
   comments: true,
   tags: true,
-  customTaskChars: true
+  customTaskChars: true,
+  math: true
 };
 function remarkObsidian(userOpts) {
   const opts = { ...defaultOptions, ...userOpts };
@@ -943,6 +1438,11 @@ function remarkObsidian(userOpts) {
     data.micromarkExtensions.push(highlightSyntax());
     data.fromMarkdownExtensions.push(highlightFromMarkdown());
     data.toMarkdownExtensions.push(highlightToMarkdown());
+  }
+  if (opts.math) {
+    data.micromarkExtensions.push(math());
+    data.fromMarkdownExtensions.push(mathFromMarkdown());
+    data.toMarkdownExtensions.push(mathToMarkdown());
   }
   const needsTransform = opts.comments || opts.customTaskChars;
   if (!needsTransform) return void 0;
@@ -987,7 +1487,7 @@ var convert2 = (
    */
   (function(test) {
     if (test === null || test === void 0) {
-      return ok2;
+      return ok3;
     }
     if (typeof test === "function") {
       return castFactory2(test);
@@ -1061,7 +1561,7 @@ function castFactory2(testFunction) {
     );
   }
 }
-function ok2() {
+function ok3() {
   return true;
 }
 function looksLikeANode2(value) {
@@ -2573,16 +3073,16 @@ function parseSelector(selector, defaultTagName) {
   const value = selector || "";
   const props = {};
   let start = 0;
-  let previous;
+  let previous2;
   let tagName;
   while (start < value.length) {
     search.lastIndex = start;
     const match = search.exec(value);
     const subvalue = value.slice(start, match ? match.index : value.length);
     if (subvalue) {
-      if (!previous) {
+      if (!previous2) {
         tagName = subvalue;
-      } else if (previous === "#") {
+      } else if (previous2 === "#") {
         props.id = subvalue;
       } else if (Array.isArray(props.className)) {
         props.className.push(subvalue);
@@ -2592,7 +3092,7 @@ function parseSelector(selector, defaultTagName) {
       start += subvalue.length;
     }
     if (match) {
-      previous = match[0];
+      previous2 = match[0];
       start++;
     }
   }
@@ -12202,7 +12702,7 @@ var esm_default = typeof structuredClone === "function" ? (
 ) : (any, options) => deserialize(serialize(any, options));
 
 // node_modules/devlop/lib/default.js
-function ok3() {
+function ok4() {
 }
 
 // node_modules/property-information/lib/util/schema.js
@@ -13458,16 +13958,16 @@ function parseSelector2(selector, defaultTagName) {
   const value = selector || "";
   const props = {};
   let start = 0;
-  let previous;
+  let previous2;
   let tagName;
   while (start < value.length) {
     search2.lastIndex = start;
     const match = search2.exec(value);
     const subvalue = value.slice(start, match ? match.index : value.length);
     if (subvalue) {
-      if (!previous) {
+      if (!previous2) {
         tagName = subvalue;
-      } else if (previous === "#") {
+      } else if (previous2 === "#") {
         props.id = subvalue;
       } else if (Array.isArray(props.className)) {
         props.className.push(subvalue);
@@ -13477,7 +13977,7 @@ function parseSelector2(selector, defaultTagName) {
       start += subvalue.length;
     }
     if (match) {
-      previous = match[0];
+      previous2 = match[0];
       start++;
     }
   }
@@ -13907,7 +14407,7 @@ function createLocation2(state, node, location3) {
           }
         }
       }
-      ok3(location3.startTag);
+      ok4(location3.startTag);
       const opening2 = position3(location3.startTag);
       const closing2 = location3.endTag ? position3(location3.endTag) : void 0;
       const data = { opening: opening2 };
@@ -14089,8 +14589,8 @@ function all3(children, parentNode, schema) {
 function patch3(from, to) {
   const position5 = from.position;
   if (position5 && position5.start && position5.end) {
-    ok3(typeof position5.start.offset === "number");
-    ok3(typeof position5.end.offset === "number");
+    ok4(typeof position5.start.offset === "number");
+    ok4(typeof position5.end.offset === "number");
     to.sourceCodeLocation = {
       startLine: position5.start.line,
       startCol: position5.start.column,
@@ -21995,7 +22495,7 @@ var convert3 = (
    */
   (function(test) {
     if (test === null || test === void 0) {
-      return ok4;
+      return ok5;
     }
     if (typeof test === "function") {
       return castFactory3(test);
@@ -22069,7 +22569,7 @@ function castFactory3(testFunction) {
     );
   }
 }
-function ok4() {
+function ok5() {
   return true;
 }
 function looksLikeANode3(value) {
@@ -22619,8 +23119,8 @@ function emphasis(state, node) {
   state.patch(node, result);
   return state.applyData(node, result);
 }
-var asciiAlphanumeric = regexCheck(/[\dA-Za-z]/);
-function regexCheck(regex2) {
+var asciiAlphanumeric2 = regexCheck2(/[\dA-Za-z]/);
+function regexCheck2(regex2) {
   return check;
   function check(code2) {
     return code2 !== null && code2 > -1 && regex2.test(String.fromCharCode(code2));
@@ -22636,7 +23136,7 @@ function normalizeUri(value) {
   while (++index2 < value.length) {
     const code2 = value.charCodeAt(index2);
     let replace = "";
-    if (code2 === 37 && asciiAlphanumeric(value.charCodeAt(index2 + 1)) && asciiAlphanumeric(value.charCodeAt(index2 + 2))) {
+    if (code2 === 37 && asciiAlphanumeric2(value.charCodeAt(index2 + 1)) && asciiAlphanumeric2(value.charCodeAt(index2 + 2))) {
       skip = 2;
     } else if (code2 < 128) {
       if (!/[!#$&-;=?-Z_a-z~]/.test(String.fromCharCode(code2))) {
@@ -24073,17 +24573,17 @@ function body2(node) {
   return !head2 || head2.type !== "comment" && !(head2.type === "text" && whitespace(head2.value.charAt(0))) && !(head2.type === "element" && (head2.tagName === "meta" || head2.tagName === "link" || head2.tagName === "script" || head2.tagName === "style" || head2.tagName === "template"));
 }
 function colgroup(node, index2, parent) {
-  const previous = siblingBefore(parent, index2);
+  const previous2 = siblingBefore(parent, index2);
   const head2 = siblingAfter(node, -1, true);
-  if (parent && previous && previous.type === "element" && previous.tagName === "colgroup" && closing(previous, parent.children.indexOf(previous), parent)) {
+  if (parent && previous2 && previous2.type === "element" && previous2.tagName === "colgroup" && closing(previous2, parent.children.indexOf(previous2), parent)) {
     return false;
   }
   return Boolean(head2 && head2.type === "element" && head2.tagName === "col");
 }
 function tbody2(node, index2, parent) {
-  const previous = siblingBefore(parent, index2);
+  const previous2 = siblingBefore(parent, index2);
   const head2 = siblingAfter(node, -1);
-  if (parent && previous && previous.type === "element" && (previous.tagName === "thead" || previous.tagName === "tbody") && closing(previous, parent.children.indexOf(previous), parent)) {
+  if (parent && previous2 && previous2.type === "element" && (previous2.tagName === "thead" || previous2.tagName === "tbody") && closing(previous2, parent.children.indexOf(previous2), parent)) {
     return false;
   }
   return Boolean(head2 && head2.type === "element" && head2.tagName === "tr");
