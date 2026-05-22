@@ -101,8 +101,60 @@
     "defaultOrder": 30,
     "defaultEnabled": true,
     "defaultOptions": {
+      "comments": true,
+      "highlight": true,
+      "wikilinks": true,
+      "callouts": true,
+      "mermaid": true,
+      "parseTags": true,
+      "parseBlockReferences": true,
       "enableInHtmlEmbed": false,
-      "enableCheckbox": true
+      "enableYouTubeEmbed": true,
+      "enableTweetEmbed": true,
+      "enableVideoEmbed": true,
+      "enableCheckbox": false,
+      "enableObsidianUri": true
+    },
+    "optionSchema": {
+      "comments": {
+        "type": "boolean"
+      },
+      "highlight": {
+        "type": "boolean"
+      },
+      "wikilinks": {
+        "type": "boolean"
+      },
+      "callouts": {
+        "type": "boolean"
+      },
+      "mermaid": {
+        "type": "boolean"
+      },
+      "parseTags": {
+        "type": "boolean"
+      },
+      "parseBlockReferences": {
+        "type": "boolean"
+      },
+      "enableInHtmlEmbed": {
+        "type": "boolean"
+      },
+      "enableYouTubeEmbed": {
+        "type": "boolean"
+      },
+      "enableTweetEmbed": {
+        "type": "boolean"
+      },
+      "enableVideoEmbed": {
+        "type": "boolean"
+      },
+      "enableCheckbox": {
+        "type": "boolean"
+      },
+      "enableObsidianUri": {
+        "type": "boolean"
+      }
     }
   }
 }
