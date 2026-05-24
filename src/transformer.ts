@@ -254,7 +254,9 @@ export const ObsidianFlavoredMarkdown: QuartzTransformerPlugin<
                       type: "html",
                       value: `<video src="${url}" controls></video>`,
                     };
-                  } else if ([".mp3", ".wav", ".m4a", ".ogg", ".oga", ".aac", ".flac"].includes(ext)) {
+                  } else if (
+                    [".mp3", ".wav", ".m4a", ".ogg", ".oga", ".aac", ".flac"].includes(ext)
+                  ) {
                     replacement = {
                       type: "html",
                       value: `<audio src="${url}" controls></audio>`,
