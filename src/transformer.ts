@@ -118,7 +118,7 @@ const calloutLineRegex = new RegExp(/^> *\[!\w+\|?.*?\][+-]?.*$/gm);
 // #(...)               -> capturing group, tag itself must start with #
 // (?:[-_\p{L}\d\p{Z}])+       -> non-capturing group, non-empty string of (Unicode-aware) alpha-numeric characters and symbols, hyphens and/or underscores
 // (?:\/[-_\p{L}\d\p{Z}]+)*)   -> non-capturing group, matches an arbitrary number of tag strings separated by "/"
-const videoExtensionRegex = new RegExp(/\.(mp4|webm|ogg|avi|mov|flv|wmv|mkv|mpg|mpeg|3gp|m4v)$/);
+const videoExtensionRegex = new RegExp(/\.(mp4|webm|ogv|avi|mov|flv|wmv|mkv|mpg|mpeg|3gp|m4v)$/);
 const wikilinkImageEmbedRegex = new RegExp(
   /^(?<alt>(?!^\d*x?\d*$).*?)?(\|?\s*?(?<width>\d+)(x(?<height>\d+))?)?$/,
 );
@@ -234,14 +234,27 @@ export const ObsidianFlavoredMarkdown: QuartzTransformerPlugin<
                       type: "html",
                       value: `<object data="${url}" type="image/svg+xml" width="${width}" height="${height}" aria-label="${alt}"></object>`,
                     };
-                  } else if ([".mp4", ".webm", ".ogv", ".mov", ".mkv"].includes(ext)) {
+                  } else if (
+                    [
+                      ".mp4",
+                      ".webm",
+                      ".ogv",
+                      ".avi",
+                      ".mov",
+                      ".flv",
+                      ".wmv",
+                      ".mkv",
+                      ".mpg",
+                      ".mpeg",
+                      ".3gp",
+                      ".m4v",
+                    ].includes(ext)
+                  ) {
                     replacement = {
                       type: "html",
                       value: `<video src="${url}" controls></video>`,
                     };
-                  } else if (
-                    [".mp3", ".webm", ".wav", ".m4a", ".ogg", ".3gp", ".flac"].includes(ext)
-                  ) {
+                  } else if ([".mp3", ".wav", ".m4a", ".ogg", ".oga", ".aac", ".flac"].includes(ext)) {
                     replacement = {
                       type: "html",
                       value: `<audio src="${url}" controls></audio>`,

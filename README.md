@@ -40,7 +40,6 @@ ExternalPlugin.ObsidianFlavoredMarkdown({
 | `callouts`             | `boolean` | `true`  | Whether to parse callouts.                  |
 | `mermaid`              | `boolean` | `true`  | Whether to parse Mermaid diagrams.          |
 | `parseTags`            | `boolean` | `true`  | Whether to parse tags.                      |
-| `parseArrows`          | `boolean` | `true`  | Whether to parse arrows.                    |
 | `parseBlockReferences` | `boolean` | `true`  | Whether to parse block references.          |
 | `enableInHtmlEmbed`    | `boolean` | `false` | Whether to enable parsing in HTML embeds.   |
 | `enableYouTubeEmbed`   | `boolean` | `true`  | Whether to enable YouTube embeds.           |
