@@ -24996,11 +24996,12 @@ var ObsidianFlavoredMarkdown = (userOpts) => {
                   };
                   replacement = linkNode;
                 } else {
-                  const anchorPart = anchor ? `#${anchor}` : "";
+                  const isBlockRef = anchor.startsWith("^");
+                  const anchorPart = anchor ? `#${isBlockRef ? anchor : slug(anchor)}` : "";
                   const linkNode = {
                     type: "link",
                     url: fp + anchorPart,
-                    children: [{ type: "text", value: alias ?? fp }]
+                    children: [{ type: "text", value: alias ?? (fp || anchor) }]
                   };
                   replacement = linkNode;
                 }
@@ -25070,11 +25071,12 @@ var ObsidianFlavoredMarkdown = (userOpts) => {
                     const anchor = rawHeading?.trim().replace(/^#+/, "") ?? "";
                     const isEmbed = fullMatch.startsWith("!");
                     let alias = rawAlias?.replace(/^\\\||\|/, "").trim() ?? "";
-                    if (alias.length === 0) alias = fp;
+                    if (alias.length === 0) alias = fp || anchor;
                     if (isEmbed) {
                       return fullMatch;
                     }
-                    const anchorPart = anchor ? `#${anchor}` : "";
+                    const isBlockRef = anchor.startsWith("^");
+                    const anchorPart = anchor ? `#${isBlockRef ? anchor : slug(anchor)}` : "";
                     if (fp.match(externalLinkRegex)) {
                       return `<a href="${fp}">${alias}</a>`;
                     }
