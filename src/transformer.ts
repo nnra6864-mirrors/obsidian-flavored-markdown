@@ -302,7 +302,12 @@ export const ObsidianFlavoredMarkdown: QuartzTransformerPlugin<
                   const linkNode: Link = {
                     type: "link",
                     url: fp + anchorPart,
-                    children: [{ type: "text", value: alias ?? (fp || anchor) }],
+                    children: [
+                      {
+                        type: "text",
+                        value: alias ?? (fp && anchor ? `${fp} > ${anchor}` : fp || anchor),
+                      },
+                    ],
                   };
                   replacement = linkNode;
                 }
@@ -378,7 +383,8 @@ export const ObsidianFlavoredMarkdown: QuartzTransformerPlugin<
                     const anchor = rawHeading?.trim().replace(/^#+/, "") ?? "";
                     const isEmbed = fullMatch.startsWith("!");
                     let alias = rawAlias?.replace(/^\\\||\|/, "").trim() ?? "";
-                    if (alias.length === 0) alias = fp || anchor;
+                    if (alias.length === 0)
+                      alias = fp && anchor ? `${fp} > ${anchor}` : fp || anchor;
 
                     if (isEmbed) {
                       return fullMatch;
