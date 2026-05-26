@@ -1661,7 +1661,7 @@ function visit2(tree, testOrVisitor, visitorOrReverse, maybeReverse) {
     return visitor(node, index2, parent);
   }
 }
-var blockReferenceRegex = /\^([-_A-Za-z0-9]+)$/;
+var blockReferenceRegex = /\^([^\s^]+)$/;
 var inlineTagTypes = /* @__PURE__ */ new Set(["p", "li"]);
 var blockTagTypes = /* @__PURE__ */ new Set(["blockquote"]);
 var isElement = (node) => typeof node === "object" && node !== null && node.type === "element";
@@ -1681,8 +1681,9 @@ var applyBlockId = (node, blockId, blocks) => {
   if (!node.properties) {
     node.properties = {};
   }
-  node.properties.id = blockId;
-  blocks[blockId] = node;
+  const slugged = blockId.toLowerCase();
+  node.properties.id = slugged;
+  blocks[slugged] = node;
 };
 var blockReferences = (tree, file) => {
   const data = ensureFileData(file);
