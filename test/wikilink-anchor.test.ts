@@ -153,11 +153,11 @@ describe("wikilink display text fallback (#2408)", () => {
     expect(getLinkText(result)).toBe("custom text");
   });
 
-  it("uses file path as display text when path is present and no alias", () => {
+  it("uses 'path > heading' as display text when both path and heading are present and no alias", () => {
     const tree = makeTree({ path: "some-note", heading: "Section" });
     const result = transformTree(tree);
 
-    expect(getLinkText(result)).toBe("some-note");
+    expect(getLinkText(result)).toBe("some-note > Section");
   });
 
   it("uses file path when only path is provided", () => {
