@@ -25002,7 +25002,12 @@ var ObsidianFlavoredMarkdown = (userOpts) => {
                   const linkNode = {
                     type: "link",
                     url: fp + anchorPart,
-                    children: [{ type: "text", value: alias ?? (fp || anchor) }]
+                    children: [
+                      {
+                        type: "text",
+                        value: alias ?? (fp && anchor ? `${fp} > ${anchor}` : fp || anchor)
+                      }
+                    ]
                   };
                   replacement = linkNode;
                 }
@@ -25072,7 +25077,8 @@ var ObsidianFlavoredMarkdown = (userOpts) => {
                     const anchor = rawHeading?.trim().replace(/^#+/, "") ?? "";
                     const isEmbed = fullMatch.startsWith("!");
                     let alias = rawAlias?.replace(/^\\\||\|/, "").trim() ?? "";
-                    if (alias.length === 0) alias = fp || anchor;
+                    if (alias.length === 0)
+                      alias = fp && anchor ? `${fp} > ${anchor}` : fp || anchor;
                     if (isEmbed) {
                       return fullMatch;
                     }
