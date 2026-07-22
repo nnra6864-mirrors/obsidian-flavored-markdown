@@ -542,7 +542,7 @@ export const ObsidianFlavoredMarkdown: QuartzTransformerPlugin<
                 node.data = {
                   hProperties: {
                     ...(node.data?.hProperties ?? {}),
-                    className: classNames.join(" "),
+                    className: classNames,
                     "data-callout": calloutType,
                     "data-callout-fold": collapse,
                     "data-callout-metadata": calloutMetaData,

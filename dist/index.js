@@ -8,7 +8,7 @@ var __export = (target, all6) => {
     __defProp(target, name, { get: all6[name], enumerable: true });
 };
 
-// ../../node_modules/.pnpm/@quartz-community+remark-obsidian@https+++codeload.github.com+quartz-community+remark-o_c871f1959a581b85b6fa2c357c61921e/node_modules/@quartz-community/remark-obsidian/dist/index.js
+// ../remark-obsidian/dist/index.js
 var convert = (
   // Note: overloads in JSDoc can’t yet use different `@template`s.
   /**
@@ -1744,7 +1744,7 @@ var checkbox = (tree) => {
       ...properties,
       checked,
       disabled: false,
-      className: "checkbox-toggle"
+      className: ["checkbox-toggle"]
     };
   });
   visit2(tree, "element", (node) => {
@@ -1774,9 +1774,6 @@ var hasClassName = (node, className) => {
   const classes = node.properties?.className;
   if (Array.isArray(classes)) {
     return classes.includes(className);
-  }
-  if (typeof classes === "string") {
-    return classes.split(/\s+/).includes(className);
   }
   return false;
 };
@@ -2079,6 +2076,7 @@ var html = create({
     allowFullScreen: boolean,
     allowPaymentRequest: boolean,
     allowUserMedia: boolean,
+    alpha: boolean,
     alt: null,
     as: null,
     async: boolean,
@@ -2092,8 +2090,12 @@ var html = create({
     checked: boolean,
     cite: null,
     className: spaceSeparated,
+    closedBy: null,
+    colorSpace: null,
     cols: number,
-    colSpan: null,
+    colSpan: number,
+    command: null,
+    commandFor: null,
     content: null,
     contentEditable: booleanish,
     controls: boolean,
@@ -2273,8 +2275,10 @@ var html = create({
     seamless: boolean,
     selected: boolean,
     shadowRootClonable: boolean,
+    shadowRootCustomElementRegistry: boolean,
     shadowRootDelegatesFocus: boolean,
     shadowRootMode: null,
+    shadowRootSerializable: boolean,
     shape: null,
     size: number,
     sizes: null,
@@ -2411,8 +2415,11 @@ var html = create({
     allowTransparency: null,
     autoCorrect: null,
     autoSave: null,
+    credentialless: boolean,
     disablePictureInPicture: boolean,
     disableRemotePlayback: boolean,
+    exportParts: commaSeparated,
+    part: spaceSeparated,
     prefix: null,
     property: null,
     results: number,
@@ -2464,6 +2471,7 @@ var svg = create({
     markerEnd: "marker-end",
     markerMid: "marker-mid",
     markerStart: "marker-start",
+    maskType: "mask-type",
     navDown: "nav-down",
     navDownLeft: "nav-down-left",
     navDownRight: "nav-down-right",
@@ -2734,6 +2742,7 @@ var svg = create({
     markerWidth: null,
     mask: null,
     maskContentUnits: null,
+    maskType: null,
     maskUnits: null,
     mathematical: null,
     max: null,
@@ -12451,7 +12460,7 @@ var youTubeEmbed = (tree) => {
         properties: {
           className: ["external-embed", "youtube"],
           allow: "fullscreen",
-          frameBorder: 0,
+          frameBorder: "0",
           width: "600px",
           src: iframeSrc
         },
@@ -25234,7 +25243,7 @@ var ObsidianFlavoredMarkdown = (userOpts) => {
                 node.data = {
                   hProperties: {
                     ...node.data?.hProperties ?? {},
-                    className: classNames.join(" "),
+                    className: classNames,
                     "data-callout": calloutType,
                     "data-callout-fold": collapse,
                     "data-callout-metadata": calloutMetaData
