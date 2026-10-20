@@ -1,10 +1,26 @@
+code.mermaid,
+.mermaid-content {
+  --pele-bg: var(--light);
+  --pele-fg: var(--darkgray);
+  --pele-muted: var(--gray);
+  --pele-line: var(--darkgray);
+  --pele-surface: var(--lightgray);
+  --pele-surface-alt: color-mix(in srgb, var(--lightgray) 85%, var(--secondary));
+  --pele-border: var(--tertiary);
+  --pele-accent: var(--secondary);
+  --pele-critical: var(--secondary);
+  --pele-error: var(--secondary);
+  --pele-font: var(--codeFont);
+  --pele-font-mono: var(--codeFont);
+}
+
 .expand-button {
   position: absolute;
   display: flex;
   float: right;
   padding: 0.4rem;
   margin: 0.3rem;
-  right: 0; // NOTE: right will be set in mermaid.inline.ts
+  right: 0;
   color: var(--gray);
   border-color: var(--dark);
   background-color: var(--light);

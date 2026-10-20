@@ -1,9 +1,14 @@
 import { registerEscapeHandler, removeAllChildren } from "./util";
+import type { Mounted } from "pele";
 
 interface Position {
   x: number;
   y: number;
 }
+
+type PeleModule = {
+  mount: (element: HTMLElement, text: string) => Mounted;
+};
 
 class DiagramPanZoom {
   private isDragging = false;
@@ -25,12 +30,10 @@ class DiagramPanZoom {
   }
 
   private setupEventListeners() {
-    // Mouse drag events
     const mouseDownHandler = this.onMouseDown.bind(this);
     const mouseMoveHandler = this.onMouseMove.bind(this);
     const mouseUpHandler = this.onMouseUp.bind(this);
 
-    // Touch drag events
     const touchStartHandler = this.onTouchStart.bind(this);
     const touchMoveHandler = this.onTouchMove.bind(this);
     const touchEndHandler = this.onTouchEnd.bind(this);
@@ -68,7 +71,6 @@ class DiagramPanZoom {
     const controls = document.createElement("div");
     controls.className = "mermaid-controls";
 
-    // Zoom controls
     const zoomIn = this.createButton("+", () => this.zoom(0.1));
     const zoomOut = this.createButton("-", () => this.zoom(-0.1));
     const resetBtn = this.createButton("Reset", () => this.resetTransform());
@@ -90,7 +92,7 @@ class DiagramPanZoom {
   }
 
   private onMouseDown(e: MouseEvent) {
-    if (e.button !== 0) return; // Only handle left click
+    if (e.button !== 0) return;
     this.isDragging = true;
     this.startPan = { x: e.clientX - this.currentPan.x, y: e.clientY - this.currentPan.y };
     this.container.style.cursor = "grabbing";
@@ -122,7 +124,7 @@ class DiagramPanZoom {
 
   private onTouchMove(e: TouchEvent) {
     if (!this.isDragging || e.touches.length !== 1) return;
-    e.preventDefault(); // Prevent scrolling
+    e.preventDefault();
 
     const touch = e.touches[0]!;
     this.currentPan = {
@@ -140,7 +142,6 @@ class DiagramPanZoom {
   private zoom(delta: number) {
     const newScale = Math.min(Math.max(this.scale + delta, this.MIN_SCALE), this.MAX_SCALE);
 
-    // Zoom around center
     const rect = this.content.getBoundingClientRect();
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
@@ -172,83 +173,53 @@ class DiagramPanZoom {
   }
 }
 
-const cssVars = [
-  "--secondary",
-  "--tertiary",
-  "--gray",
-  "--light",
-  "--lightgray",
-  "--highlight",
-  "--dark",
-  "--darkgray",
-  "--codeFont",
-] as const;
+function diagramSource(node: HTMLElement): string {
+  const clipboard = node.getAttribute("data-clipboard");
+  if (clipboard) {
+    try {
+      return JSON.parse(clipboard) as string;
+    } catch {
+      return node.textContent ?? "";
+    }
+  }
+  return node.textContent ?? "";
+}
 
-let mermaidImport = undefined;
+let peleImport: PeleModule | undefined;
+const mountedDiagrams = new WeakMap<HTMLElement, Mounted>();
+
 async function renderMermaidDiagrams() {
-  const center = document.querySelector(".center") as HTMLElement;
+  const center = document.querySelector(".center") as HTMLElement | null;
+  if (!center) return;
   const nodes = center.querySelectorAll("code.mermaid") as NodeListOf<HTMLElement>;
   if (nodes.length === 0) return;
 
-  mermaidImport ||= await import(
+  peleImport ||= (await import(
     // @ts-expect-error -- remote ESM import
-    "https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.4.0/mermaid.esm.min.mjs"
-  );
-  const mermaid = mermaidImport.default;
+    "https://cdn.jsdelivr.net/npm/pele@1.8.0/dist/pele.js"
+  )) as PeleModule;
+  const { mount } = peleImport;
 
-  const textMapping: WeakMap<HTMLElement, string> = new WeakMap();
   for (const node of nodes) {
-    textMapping.set(node, node.innerText);
-  }
-
-  async function renderMermaid() {
-    // de-init any other diagrams
-    for (const node of nodes) {
-      node.removeAttribute("data-processed");
-      const oldText = textMapping.get(node);
-      if (oldText) {
-        node.innerHTML = oldText;
-      }
+    const source = diagramSource(node);
+    const existing = mountedDiagrams.get(node);
+    if (existing) {
+      existing.update(source);
+      continue;
     }
-
-    const computedStyleMap = cssVars.reduce(
-      (acc, key) => {
-        acc[key] = window.getComputedStyle(document.documentElement).getPropertyValue(key);
-        return acc;
-      },
-      {} as Record<(typeof cssVars)[number], string>,
-    );
-
-    const darkMode = document.documentElement.getAttribute("saved-theme") === "dark";
-    mermaid.initialize({
-      startOnLoad: false,
-      securityLevel: "loose",
-      theme: darkMode ? "dark" : "base",
-      themeVariables: {
-        fontFamily: computedStyleMap["--codeFont"],
-        primaryColor: computedStyleMap["--light"],
-        primaryTextColor: computedStyleMap["--darkgray"],
-        primaryBorderColor: computedStyleMap["--tertiary"],
-        lineColor: computedStyleMap["--darkgray"],
-        secondaryColor: computedStyleMap["--secondary"],
-        tertiaryColor: computedStyleMap["--tertiary"],
-        clusterBkg: computedStyleMap["--light"],
-        edgeLabelBackground: computedStyleMap["--highlight"],
-      },
+    mountedDiagrams.set(node, mount(node, source));
+    window.addCleanup(() => {
+      mountedDiagrams.get(node)?.destroy();
+      mountedDiagrams.delete(node);
     });
-
-    await mermaid.run({ nodes });
   }
-
-  await renderMermaid();
-  document.addEventListener("themechange", renderMermaid);
-  window.addCleanup(() => document.removeEventListener("themechange", renderMermaid));
 
   for (let i = 0; i < nodes.length; i++) {
     const codeBlock = nodes[i] as HTMLElement;
     const pre = codeBlock.parentElement as HTMLPreElement;
-    const clipboardBtn = pre.querySelector(".clipboard-button") as HTMLButtonElement;
-    const expandBtn = pre.querySelector(".expand-button") as HTMLButtonElement;
+    const clipboardBtn = pre.querySelector(".clipboard-button") as HTMLButtonElement | null;
+    const expandBtn = pre.querySelector(".expand-button") as HTMLButtonElement | null;
+    if (!clipboardBtn || !expandBtn) continue;
 
     const clipboardStyle = window.getComputedStyle(clipboardBtn);
     const clipboardWidth =
@@ -256,13 +227,11 @@ async function renderMermaidDiagrams() {
       parseFloat(clipboardStyle.marginLeft || "0") +
       parseFloat(clipboardStyle.marginRight || "0");
 
-    // Set expand button position
     expandBtn.style.right = `calc(${clipboardWidth}px + 0.3rem)`;
     pre.prepend(expandBtn);
 
-    // query popup container
-    const popupContainer = pre.querySelector("#mermaid-container") as HTMLElement;
-    if (!popupContainer) return;
+    const popupContainer = pre.querySelector("#mermaid-container") as HTMLElement | null;
+    if (!popupContainer) continue;
 
     let panZoom: DiagramPanZoom | null = null;
     const showMermaid = () => {
@@ -271,15 +240,13 @@ async function renderMermaidDiagrams() {
       if (!content) return;
       removeAllChildren(content);
 
-      // Clone the mermaid content
-      const mermaidContent = codeBlock.querySelector("svg")!.cloneNode(true) as SVGElement;
-      content.appendChild(mermaidContent);
+      const svg = codeBlock.querySelector("svg");
+      if (!svg) return;
+      content.appendChild(svg.cloneNode(true) as SVGElement);
 
-      // Show container
       popupContainer.classList.add("active");
       container.style.cursor = "grab";
 
-      // Initialize pan-zoom after showing the popup
       panZoom = new DiagramPanZoom(container, content);
     };
 
@@ -299,5 +266,9 @@ async function renderMermaidDiagrams() {
   }
 }
 
-document.addEventListener("nav", renderMermaidDiagrams);
-document.addEventListener("render", renderMermaidDiagrams);
+document.addEventListener("nav", () => {
+  void renderMermaidDiagrams();
+});
+document.addEventListener("render", () => {
+  void renderMermaidDiagrams();
+});

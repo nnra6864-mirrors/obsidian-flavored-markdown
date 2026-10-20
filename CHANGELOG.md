@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- Render Mermaid diagrams with [Pele](https://pele.run) instead of Mermaid.js. Fence language and the `mermaid` option are unchanged; theming uses Pele CSS variables mapped to Quartz tokens.
+
 ## 1.0.0
 
 ### Major Changes
