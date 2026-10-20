@@ -2,7 +2,7 @@
 
 Transforms Obsidian-specific markdown syntax including wikilinks, callouts, highlights, Mermaid diagrams, tags, and media embeds.
 
-Mermaid fences default to the Mermaid.js renderer. You can opt into [Pele](https://pele.run) with `diagramRenderer: pele`. Mermaid.js remains the default during a deprecation period; Pele is the intended long-term renderer.
+Mermaid fences use Mermaid.js by default. Set `diagramRenderer: pele` to use [Pele](https://pele.run) instead (`pele/lazy`). Mermaid.js is deprecated and will move to Pele later.
 
 ## Installation
 
@@ -19,7 +19,7 @@ plugins:
     options:
       enableInHtmlEmbed: false
       enableCheckbox: true
-      # diagramRenderer: pele  # opt-in; default is mermaid
+      # diagramRenderer: pele
 ```
 
 For advanced use cases, you can override in TypeScript:
@@ -36,20 +36,20 @@ ExternalPlugin.ObsidianFlavoredMarkdown({
 
 ## Configuration
 
-| Option                 | Type                    | Default     | Description                                                                                             |
-| ---------------------- | ----------------------- | ----------- | ------------------------------------------------------------------------------------------------------- |
-| `comments`             | `boolean`               | `true`      | Whether to parse Obsidian-style comments.                                                               |
-| `highlight`            | `boolean`               | `true`      | Whether to parse Obsidian-style highlights.                                                             |
-| `wikilinks`            | `boolean`               | `true`      | Whether to parse wikilinks.                                                                             |
-| `callouts`             | `boolean`               | `true`      | Whether to parse callouts.                                                                              |
-| `mermaid`              | `boolean`               | `true`      | Whether to parse Mermaid diagram fences.                                                                |
-| `diagramRenderer`      | `"mermaid"` \| `"pele"` | `"mermaid"` | Which engine draws Mermaid fences. Pele is opt-in; Mermaid.js is default (deprecated path toward Pele). |
-| `parseTags`            | `boolean`               | `true`      | Whether to parse tags.                                                                                  |
-| `parseBlockReferences` | `boolean`               | `true`      | Whether to parse block references.                                                                      |
-| `enableInHtmlEmbed`    | `boolean`               | `false`     | Whether to enable parsing in HTML embeds.                                                               |
-| `enableYouTubeEmbed`   | `boolean`               | `true`      | Whether to enable YouTube embeds.                                                                       |
-| `enableVideoEmbed`     | `boolean`               | `true`      | Whether to enable video embeds.                                                                         |
-| `enableCheckbox`       | `boolean`               | `false`     | Whether to enable checkboxes.                                                                           |
+| Option                 | Type                    | Default     | Description                                                                              |
+| ---------------------- | ----------------------- | ----------- | ---------------------------------------------------------------------------------------- |
+| `comments`             | `boolean`               | `true`      | Whether to parse Obsidian-style comments.                                                |
+| `highlight`            | `boolean`               | `true`      | Whether to parse Obsidian-style highlights.                                              |
+| `wikilinks`            | `boolean`               | `true`      | Whether to parse wikilinks.                                                              |
+| `callouts`             | `boolean`               | `true`      | Whether to parse callouts.                                                               |
+| `mermaid`              | `boolean`               | `true`      | Whether to parse Mermaid diagram fences.                                                 |
+| `diagramRenderer`      | `"mermaid"` \| `"pele"` | `"mermaid"` | Renderer for Mermaid fences. Default Mermaid.js; Pele is opt-in (Mermaid.js deprecated). |
+| `parseTags`            | `boolean`               | `true`      | Whether to parse tags.                                                                   |
+| `parseBlockReferences` | `boolean`               | `true`      | Whether to parse block references.                                                       |
+| `enableInHtmlEmbed`    | `boolean`               | `false`     | Whether to enable parsing in HTML embeds.                                                |
+| `enableYouTubeEmbed`   | `boolean`               | `true`      | Whether to enable YouTube embeds.                                                        |
+| `enableVideoEmbed`     | `boolean`               | `true`      | Whether to enable video embeds.                                                          |
+| `enableCheckbox`       | `boolean`               | `false`     | Whether to enable checkboxes.                                                            |
 
 ## Documentation
 
