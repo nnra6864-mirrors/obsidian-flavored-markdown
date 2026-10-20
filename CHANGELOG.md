@@ -2,9 +2,13 @@
 
 ## Unreleased
 
+### Added
+
+- Opt-in [Pele](https://pele.run) diagram renderer via `diagramRenderer: "pele"`. Implementation lives in `pele.inline.ts` / `pele.inline.scss` and imports `pele/lazy` (no CDN). Fence language and the `mermaid` enable flag are unchanged.
+
 ### Changed
 
-- Render Mermaid diagrams with [Pele](https://pele.run) instead of Mermaid.js. Fence language and the `mermaid` option are unchanged; theming uses Pele CSS variables mapped to Quartz tokens.
+- **Deprecation:** Mermaid.js remains the default (`diagramRenderer: "mermaid"`) so existing sites keep working. Mermaid.js is on a deprecation path toward Pele as the long-term renderer; switch with `diagramRenderer: "pele"` when ready.
 
 ## 1.0.0
 
